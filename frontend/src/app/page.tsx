@@ -6,30 +6,10 @@ import { Sidebar } from "@/components/Sidebar";
 import { ChatInterface } from "@/components/ChatInterface";
 import { ThemeSelector } from "@/components/ThemeSelector";
 import { LiveReasoning } from "@/components/AgentReasoning";
+import { MemoryPanel } from "@/components/MemoryPanel";
 import { ApiSettings, ApiProvider } from "@/components/ApiSettings";
-import { Settings } from "lucide-react";
-
-interface Agent {
-  name: string;
-  role: string;
-  level: number;
-}
-
-interface AgentDialogue {
-  agentName: string;
-  message: string;
-  timestamp: Date;
-}
-
-interface Message {
-  id: string;
-  role: "user" | "assistant" | "system";
-  content: string;
-  timestamp: Date;
-  agents?: string[];
-  status?: "pending" | "processing" | "completed" | "error";
-  dialogues?: AgentDialogue[];
-}
+import { Settings, Plus, RotateCcw } from "lucide-react";
+import { Agent, Message } from "@/types";
 
 const AGENTS_DATA: Agent[] = [
   // Level 1 - Critical
@@ -260,10 +240,27 @@ export default function Home() {
     }
   };
 
+  const handleNewChat = () => {
+    setMessages([]);
+    setIsProcessing(false);
+  };
+
+  const handleLoadMemory = (memory: any) => {
+    setMessages(memory.messages);
+    setSelectedAgents(memory.agents);
+  };
+
   return (
     <div className="h-screen flex flex-col bg-background">
-      {/* Theme Selector & API Settings - Fixed Position */}
+      {/* Theme Selector & API Settings & New Chat - Fixed Position */}
       <div className="fixed top-4 right-4 z-[100] flex items-center gap-2">
+        <button
+          onClick={handleNewChat}
+          className="p-2 rounded-lg bg-card border border-border hover:bg-muted transition-colors"
+          title="Nuevo Chat"
+        >
+          <Plus className="h-4 w-4 text-primary" />
+        </button>
         <button
           onClick={() => setShowApiSettings(true)}
           className="p-2 rounded-lg bg-card border border-border hover:bg-muted transition-colors"
@@ -320,6 +317,14 @@ export default function Home() {
             />
           </div>
         </main>
+
+        {/* Memory Panel - Right Side */}
+        <MemoryPanel
+          messages={messages}
+          currentAgents={selectedAgents}
+          onSaveMemory={() => {}}
+          onLoadMemory={handleLoadMemory}
+        />
       </div>
     </div>
   );
