@@ -1,17 +1,9 @@
 """
-Servicio de agentes ATP - Conecta con el sistema de agentes CrewAI
+Servicio de agentes ATP v1.0.1
+Usa OpenAI SDK directamente - Sistema simplificado y robusto
 """
-import sys
-import os
-
-# Add parent directory to path to import agents
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
-
 from typing import List, Dict, Any, Optional
-from crewai import Crew, Task, Process, Agent
-from app.llm_providers import get_llm, get_llm_from_config
-from app.config import MODELS
-
+from app.llm_providers import chat_completion, get_openai_client
 
 # Agent definitions with enhanced reasoning
 AGENT_DEFINITIONS = {
@@ -226,12 +218,11 @@ AGENT_DEFINITIONS = {
 
 
 class AgentService:
-    """Servicio para gestionar y ejecutar agentes"""
+    """Servicio para gestionar y ejecutar agentes usando OpenAI SDK directamente"""
     
     def __init__(self, model_id: str = "deepseek", api_config: Optional[Dict[str, Any]] = None):
         self.model_id = model_id
         self.api_config = api_config
-        self.llm = get_llm(model_id, api_config)
     
     def get_agent_info(self, agent_name: str) -> Dict[str, Any]:
         """Obtiene información de un agente"""
@@ -249,29 +240,23 @@ class AgentService:
             for name, info in AGENT_DEFINITIONS.items()
         ]
     
-    def create_agent(self, agent_name: str) -> Agent:
-        """Crea un agente de CrewAI"""
-        if agent_name not in AGENT_DEFINITIONS:
-            raise ValueError(f"Agent {agent_name} not found")
-        
-        agent_def = AGENT_DEFINITIONS[agent_name]
-        
-        return Agent(
-            role=agent_def["role"],
-            goal=agent_def["goal"],
-            backstory=agent_def["backstory"] + """
-            
-            MARCO DE RAZONAMIENTO:
-            1. Comprende completamente el problema antes de actuar
-            2. Descompone problemas complejos en partes manejables
-            3. Considera múltiples perspectivas
-            4. Sintetiza hallazgos en soluciones coherentes
-            5. Evalúa tu propio razonamiento
-            """,
-            llm=self.llm,
-            verbose=True,
-            allow_delegation=True,
-        )
+    def _build_system_prompt(self, agent_name: str) -> str:
+        """Construye el system prompt para un agente"""
+        agent_def = AGENT_DEFINITIONS.get(agent_name, {})
+        return f"""Eres {agent_def.get('role', 'un asistente experto')}.
+
+TU OBJETIVO: {agent_def.get('goal', 'Ayudar al usuario de la mejor manera posible')}
+
+CONTEXTO: {agent_def.get('backstory', '')}
+
+MARCO DE RAZONAMIENTO:
+1. Comprende completamente el problema antes de actuar
+2. Descompone problemas complejos en partes manejables
+3. Considera múltiples perspectivas
+4. Sintetiza hallazgos en soluciones coherentes
+5. Evalúa tu propio razonamiento
+
+Proporciona respuestas completas, profesionales y bien estructuradas."""
     
     def execute_task(
         self, 
@@ -279,7 +264,7 @@ class AgentService:
         agent_names: List[str],
         context: str = None
     ) -> Dict[str, Any]:
-        """Ejecuta una tarea con los agentes seleccionados - con comunicación entre agentes"""
+        """Ejecuta una tarea con los agentes seleccionados usando OpenAI SDK directamente"""
         
         if not agent_names:
             return {
@@ -289,167 +274,95 @@ class AgentService:
                 "dialogues": [],
             }
         
-        # Create agents
-        agents = []
-        agent_name_map = {}
-        for name in agent_names[:5]:  # Limit to 5 agents
-            try:
-                agent = self.create_agent(name)
-                agents.append(agent)
-                agent_name_map[agent] = name
-            except Exception as e:
-                print(f"Error creating agent {name}: {e}")
-        
-        if not agents:
-            return {
-                "success": False,
-                "result": "No se pudieron crear los agentes",
-                "agents_used": [],
-                "dialogues": [],
-            }
-        
         dialogues = []
+        previous_responses = []
+        final_result = ""
         
-        # Create collaborative tasks where agents communicate
-        tasks = []
+        # Limitar a 5 agentes máximo
+        selected_agents = agent_names[:5]
         
-        # Task 1: Initial Analysis
-        tasks.append(Task(
-            description=f"""
-            TAREA: Analiza la siguiente solicitud del usuario y proporciona tu perspectiva inicial.
-            
-            SOLICITUD: "{message}"
-            
-            {f'CONTEXTO: {context}' if context else ''}
-            
-            INSTRUCCIONES:
-            1. Analiza el problema desde tu perspectiva especializada
-            2. Identifica los puntos clave que necesitan atención
-            3. Proporciona tu análisis inicial
-            4. Indica qué aspectos podrían beneficiarse de la perspectiva de otros agentes
-            
-            Sé conciso pero completo. Tu análisis será compartido con otros agentes.
-            """,
-            expected_output="Análisis inicial estructurado con puntos clave identificados",
-            agent=agents[0],
-        ))
-        
-        # Task 2: Collaborative Review (if more agents)
-        if len(agents) > 1:
-            tasks.append(Task(
-                description=f"""
-                TAREA: Revisa el análisis del agente anterior y añade tu perspectiva.
-                
-                SOLICITUD ORIGINAL: "{message}"
-                
-                INSTRUCCIONES:
-                1. Lee cuidadosamente el análisis previo
-                2. Identifica puntos que puedes expandir o mejorar
-                3. Añade información desde tu área de expertise
-                4. Señala cualquier aspecto que necesite más consideración
-                5. Comunica tus hallazgos de forma clara
-                
-                Colabora constructivamente con el análisis previo.
-                """,
-                expected_output="Análisis expandido con perspectiva adicional",
-                agent=agents[1],
-                context=[tasks[0]],
-            ))
-        
-        # Task 3: Deep Analysis (if more agents)
-        if len(agents) > 2:
-            tasks.append(Task(
-                description=f"""
-                TAREA: Profundiza en los aspectos más complejos identificados.
-                
-                SOLICITUD ORIGINAL: "{message}"
-                
-                INSTRUCCIONES:
-                1. Revisa los análisis de los agentes anteriores
-                2. Identifica los aspectos que requieren análisis más profundo
-                3. Aplica razonamiento crítico a las conclusiones previas
-                4. Proporciona insights adicionales desde tu expertise
-                5. Prepara puntos para la síntesis final
-                """,
-                expected_output="Análisis profundo con insights críticos",
-                agent=agents[2],
-                context=tasks[:2],
-            ))
-        
-        # Task 4: Validation (if more agents)
-        if len(agents) > 3:
-            tasks.append(Task(
-                description=f"""
-                TAREA: Valida y verifica las conclusiones de los agentes anteriores.
-                
-                SOLICITUD ORIGINAL: "{message}"
-                
-                INSTRUCCIONES:
-                1. Revisa todos los análisis previos
-                2. Verifica la consistencia de las conclusiones
-                3. Identifica posibles errores o inconsistencias
-                4. Confirma los puntos bien fundamentados
-                5. Sugiere correcciones si es necesario
-                """,
-                expected_output="Validación de conclusiones con correcciones si aplica",
-                agent=agents[3],
-                context=tasks[:3],
-            ))
-        
-        # Task 5: Final Synthesis (if more agents)
-        if len(agents) > 4:
-            tasks.append(Task(
-                description=f"""
-                TAREA: Sintetiza todo el trabajo de los agentes en una respuesta final.
-                
-                SOLICITUD ORIGINAL: "{message}"
-                
-                INSTRUCCIONES:
-                1. Integra todos los análisis y perspectivas
-                2. Crea una respuesta coherente y completa
-                3. Asegura que responde completamente a la solicitud
-                4. Formatea la respuesta de manera clara y profesional
-                5. Incluye conclusiones y recomendaciones si aplica
-                
-                Esta es la respuesta final que verá el usuario.
-                """,
-                expected_output="Respuesta final integrada, clara y completa",
-                agent=agents[4],
-                context=tasks[:4],
-            ))
-        
-        # Create and run crew with hierarchical process for better collaboration
         try:
-            crew = Crew(
-                agents=agents,
-                tasks=tasks,
-                process=Process.sequential,
-                verbose=True,
-                memory=True,  # Enable memory for better context sharing
-            )
+            for i, agent_name in enumerate(selected_agents):
+                if agent_name not in AGENT_DEFINITIONS:
+                    continue
+                
+                # Construir mensajes para este agente
+                messages = [
+                    {"role": "system", "content": self._build_system_prompt(agent_name)}
+                ]
+                
+                # Añadir contexto de agentes anteriores si existe
+                if previous_responses:
+                    context_msg = "ANÁLISIS PREVIOS DE OTROS AGENTES:\n"
+                    for resp in previous_responses:
+                        context_msg += f"\n--- {resp['agent']} ---\n{resp['response']}\n"
+                    messages.append({"role": "assistant", "content": context_msg})
+                
+                # Añadir contexto adicional si existe
+                user_msg = message
+                if context:
+                    user_msg = f"CONTEXTO: {context}\n\nSOLICITUD: {message}"
+                
+                messages.append({"role": "user", "content": user_msg})
+                
+                # Llamar al LLM usando chat_completion
+                agent_response = chat_completion(
+                    messages=messages,
+                    api_config=self.api_config
+                )
+                
+                # Guardar respuesta
+                dialogues.append({
+                    "agent": agent_name,
+                    "message": agent_response,
+                    "step": i + 1,
+                })
+                
+                previous_responses.append({
+                    "agent": AGENT_DEFINITIONS[agent_name]["role"],
+                    "response": agent_response
+                })
+                
+                final_result = agent_response
             
-            result = crew.kickoff()
-            
-            # Build dialogue from task outputs
-            for i, task in enumerate(tasks):
-                if hasattr(task, 'output') and task.output:
-                    agent_name = agent_names[i] if i < len(agent_names) else f"agent_{i}"
-                    dialogues.append({
-                        "agent": agent_name,
-                        "message": str(task.output),
-                        "step": i + 1,
-                    })
+            # Si hay múltiples agentes, crear una síntesis final
+            if len(selected_agents) > 1 and len(previous_responses) > 1:
+                synthesis_messages = [
+                    {"role": "system", "content": "Eres el Agente de Síntesis Final. Tu trabajo es integrar las respuestas de múltiples agentes en una respuesta coherente y completa."}
+                ]
+                
+                synthesis_content = f"SOLICITUD ORIGINAL: {message}\n\nRESPUESTAS DE LOS AGENTES:\n"
+                for resp in previous_responses:
+                    synthesis_content += f"\n--- {resp['agent']} ---\n{resp['response']}\n"
+                
+                synthesis_content += "\nINSTRUCCIONES: Integra los mejores puntos de cada agente, elimina redundancias, y crea una respuesta final coherente y profesional."
+                
+                synthesis_messages.append({"role": "user", "content": synthesis_content})
+                
+                final_result = chat_completion(
+                    messages=synthesis_messages,
+                    api_config=self.api_config
+                )
+                
+                dialogues.append({
+                    "agent": "synthesis",
+                    "message": final_result,
+                    "step": len(selected_agents) + 1,
+                })
             
             return {
                 "success": True,
-                "result": str(result),
-                "agents_used": agent_names[:5],
+                "result": final_result,
+                "agents_used": selected_agents,
                 "dialogues": dialogues,
             }
+            
         except Exception as e:
+            error_msg = str(e)
             return {
                 "success": False,
-                "result": f"Error ejecutando los agentes: {str(e)}",
-                "agents_used": agent_names[:5],
+                "result": "",
+                "error": error_msg,
+                "agents_used": selected_agents,
                 "dialogues": dialogues,
             }

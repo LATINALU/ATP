@@ -10,7 +10,7 @@ Arquitectura:
 - CAPA 5: Procesamiento y Salida (Síntesis final)
 """
 
-from .central_agent import CentralAgent
+from .central_agent import CentralAgent, get_central_agent
 from .memory import MemorySystem, ShortTermMemory, LongTermMemory
 from .planning import PlanningEngine, ReACTPlanner, ChainOfThoughtPlanner
 from .mcp_servers import MCPServerManager, LocalDataServer, SearchEngineServer, CloudEngineServer
@@ -19,6 +19,7 @@ from .sub_agents import SubAgentManager
 __version__ = "1.0.1"
 __all__ = [
     "CentralAgent",
+    "get_central_agent",
     "MemorySystem",
     "ShortTermMemory", 
     "LongTermMemory",

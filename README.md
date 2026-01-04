@@ -1,14 +1,17 @@
 # ATP - Agentes de Tareas Polivalentes
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.0.1-green.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.0.2-green.svg" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">
   <img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python">
   <img src="https://img.shields.io/badge/next.js-14-black.svg" alt="Next.js">
+  <img src="https://img.shields.io/badge/OpenAI_SDK-2.9+-orange.svg" alt="OpenAI SDK">
 </p>
 
-Sistema de **30 Agentes de IA** con CrewAI, organizados en 5 niveles de importancia, diseñados para resolver cualquier tipo de tarea con capacidad extrema de razonamiento.
+Sistema de **30 Agentes de IA** con OpenAI SDK, organizados en 5 niveles de importancia, diseñados para resolver cualquier tipo de tarea con capacidad extrema de razonamiento.
+
+> **v1.0.2 - Rework Completo**: Sistema reescrito usando OpenAI SDK directamente para máxima compatibilidad y estabilidad. Eliminadas dependencias problemáticas (CrewAI, LangChain).
 
 ## 🚀 Características
 

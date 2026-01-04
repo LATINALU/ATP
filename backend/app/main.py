@@ -9,7 +9,8 @@ import sys
 import os
 
 # Añadir path del proyecto para imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(0, '/app')
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.config import CORS_ORIGINS, MODELS, HOST, PORT
 from app.models import ChatRequest, ChatResponse, HealthResponse, AgentInfo

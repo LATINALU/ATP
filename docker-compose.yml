@@ -1,21 +1,24 @@
 version: '3.8'
 
 services:
-  # Backend FastAPI
+  # Backend FastAPI con Agentic RAG
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: atp-backend
     environment:
       - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
       - GROQ_API_KEY=${GROQ_API_KEY}
       - HOST=0.0.0.0
       - PORT=8000
+      - PYTHONPATH=/app
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
+      - ./agentic_rag:/app/agentic_rag
+      - ./data:/app/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]

@@ -1,9 +1,10 @@
 """
-Proveedores de LLM para múltiples APIs
-Usa OpenAI SDK compatible con todos los proveedores principales
+Proveedores de LLM para ATP v1.0.1
+Usa OpenAI SDK directamente - compatible con múltiples proveedores
 """
-from langchain_openai import ChatOpenAI
-from typing import Optional, Dict, Any
+import os
+from openai import OpenAI
+from typing import Optional, Dict, Any, List
 from app.config import MODELS, DEEPSEEK_API_KEY, GROQ_API_KEY
 
 # Configuración de proveedores con sus endpoints y modelos por defecto
@@ -36,87 +37,67 @@ PROVIDERS = {
         "base_url": "http://localhost:11434/v1",
         "model": "llama3.2",
     },
-    "anthropic": {
-        "base_url": "https://api.anthropic.com/v1",
-        "model": "claude-3-5-sonnet-20241022",
-    },
-    "cohere": {
-        "base_url": "https://api.cohere.ai/v1",
-        "model": "command-r-plus",
-    },
 }
 
 
-def get_llm_from_config(api_config: Dict[str, Any]):
+def get_openai_client(api_config: Dict[str, Any] = None) -> tuple[OpenAI, str]:
     """
-    Crea un LLM usando OpenAI SDK (compatible con todos los proveedores).
+    Obtiene un cliente OpenAI configurado y el modelo a usar.
+    Retorna (client, model_name)
     """
-    api_type = api_config.get("type", "openai")
-    api_key = api_config.get("api_key", "")
-    custom_base_url = api_config.get("base_url")
-    
-    if not api_key:
-        raise ValueError("API key es requerida. Configúrala en ⚙️ Configuración.")
-    
-    # Obtener configuración del proveedor
-    provider_config = PROVIDERS.get(api_type, PROVIDERS["openai"])
-    base_url = custom_base_url or provider_config["base_url"]
-    model = provider_config["model"]
-    
-    return ChatOpenAI(
-        model=model,
-        api_key=api_key,
-        base_url=base_url,
-        temperature=0.7,
-        max_tokens=4096,
-    )
-
-
-def get_llm(model_id: str = "deepseek", api_config: Optional[Dict[str, Any]] = None):
-    """
-    Obtiene el LLM configurado según el modelo seleccionado.
-    Si se proporciona api_config, usa la configuración del usuario.
-    """
-    # Si hay configuración del usuario, usarla
     if api_config and api_config.get("api_key"):
-        return get_llm_from_config(api_config)
+        api_type = api_config.get("type", "openai")
+        api_key = api_config.get("api_key", "")
+        custom_base_url = api_config.get("base_url")
+        
+        provider_config = PROVIDERS.get(api_type, PROVIDERS["openai"])
+        base_url = custom_base_url or provider_config["base_url"]
+        model = provider_config["model"]
+        
+        client = OpenAI(api_key=api_key, base_url=base_url)
+        return client, model
     
-    # Fallback a configuración por defecto (variables de entorno)
-    if model_id not in MODELS:
-        model_id = "deepseek"
-    
-    model_config = MODELS[model_id]
-    provider = model_config["provider"]
-    
-    if provider == "deepseek":
-        if not DEEPSEEK_API_KEY:
-            raise ValueError("DeepSeek API key not configured. Please add your API key in Settings.")
-        return ChatOpenAI(
-            model=model_config["model"],
-            api_key=DEEPSEEK_API_KEY,
-            base_url=model_config["base_url"],
-            temperature=0.7,
-            max_tokens=4096,
-        )
-    elif provider == "groq":
-        if not GROQ_API_KEY:
-            raise ValueError("Groq API key not configured. Please add your API key in Settings.")
-        return ChatGroq(
-            model=model_config["model"],
-            api_key=GROQ_API_KEY,
-            temperature=0.7,
-            max_tokens=4096,
-        )
+    # Fallback a variables de entorno
+    if DEEPSEEK_API_KEY:
+        client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url="https://api.deepseek.com/v1")
+        return client, "deepseek-chat"
+    elif GROQ_API_KEY:
+        client = OpenAI(api_key=GROQ_API_KEY, base_url="https://api.groq.com/openai/v1")
+        return client, "llama-3.3-70b-versatile"
     else:
-        raise ValueError(f"No API key configured for {provider}. Please add your API key in Settings.")
+        raise ValueError("No API key configured. Please add your API key in Settings.")
 
 
-def test_connection(model_id: str = "deepseek", api_config: Optional[Dict[str, Any]] = None) -> bool:
+def chat_completion(
+    messages: List[Dict[str, str]], 
+    api_config: Dict[str, Any] = None,
+    temperature: float = 0.7,
+    max_tokens: int = 4096
+) -> str:
+    """
+    Ejecuta una llamada de chat completion y retorna el contenido.
+    """
+    client, model = get_openai_client(api_config)
+    
+    response = client.chat.completions.create(
+        model=model,
+        messages=messages,
+        temperature=temperature,
+        max_tokens=max_tokens,
+    )
+    
+    return response.choices[0].message.content
+
+
+def test_connection(api_config: Dict[str, Any] = None) -> bool:
     """Prueba la conexión con el modelo"""
     try:
-        llm = get_llm(model_id, api_config)
-        response = llm.invoke("Responde solo 'OK'")
-        return "OK" in response.content or len(response.content) > 0
+        result = chat_completion(
+            messages=[{"role": "user", "content": "Responde solo 'OK'"}],
+            api_config=api_config,
+            max_tokens=10
+        )
+        return "OK" in result or len(result) > 0
     except Exception as e:
-        print(f"Error testing {model_id}: {e}")
+        print(f"Error testing connection: {e}")
         return False
