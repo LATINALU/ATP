@@ -1,8 +1,7 @@
-<<<<<<< HEAD
 # ATP - Agentes de Tareas Polivalentes
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.0.0-green.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.0.1-green.svg" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">
   <img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python">
@@ -186,6 +185,78 @@ Tarea: Crea una función en Python para ordenar una lista
 
 ---
 
+## 🧠 Sistema Agentic RAG (v1.0.1)
+
+El sistema ATP ahora incluye **Agentic RAG** (Generación Aumentada por Recuperación con Agentes), una arquitectura avanzada de 5 capas:
+
+### Arquitectura de Capas
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  CAPA 1: INTERACCIÓN INICIAL                                    │
+│  Usuario → Query → Agente Central                               │
+├─────────────────────────────────────────────────────────────────┤
+│  CAPA 2: CEREBRO DEL COORDINADOR                                │
+│  ┌─────────────┐  ┌─────────────────────────────────┐          │
+│  │   MEMORY    │  │         PLANNING                │          │
+│  │ Short Term  │  │  ReACT + Chain of Thought       │          │
+│  │ Long Term   │  │  Descomposición de tareas       │          │
+│  └─────────────┘  └─────────────────────────────────┘          │
+├─────────────────────────────────────────────────────────────────┤
+│  CAPA 3: DELEGACIÓN DE TAREAS                                   │
+│  Agente Central → Sub-Agentes Especializados (30 agentes)       │
+├─────────────────────────────────────────────────────────────────┤
+│  CAPA 4: MCP SERVERS (Model Context Protocol)                   │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐            │
+│  │ Local Data   │ │Search Engine │ │ Cloud Engine │            │
+│  │ (Archivos)   │ │ (Internet)   │ │ (AWS/Azure)  │            │
+│  └──────────────┘ └──────────────┘ └──────────────┘            │
+├─────────────────────────────────────────────────────────────────┤
+│  CAPA 5: PROCESAMIENTO Y SALIDA                                 │
+│  Síntesis → LLM → Respuesta Final → Usuario                     │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Componentes Principales
+
+| Componente | Descripción |
+|------------|-------------|
+| **Central Agent** | Coordinador principal que orquesta todo el flujo |
+| **Memory System** | Memoria a corto plazo (sesión) y largo plazo (persistente) |
+| **Planning Engine** | ReACT + Chain of Thought para planificación inteligente |
+| **MCP Servers** | Conexión con datos locales, búsqueda web y cloud |
+| **Sub-Agent Manager** | Gestiona los 30 agentes especializados |
+
+### Endpoints API Agentic RAG
+
+```bash
+# Consulta principal
+POST /api/agentic-rag
+{
+  "query": "Tu consulta aquí",
+  "agents": ["reasoning_agent", "coding_agent"],  # opcional
+  "use_memory": true,
+  "use_planning": true
+}
+
+# Estado del sistema
+GET /api/agentic-rag/status
+
+# Agentes disponibles
+GET /api/agentic-rag/agents
+
+# Almacenar conocimiento
+POST /api/agentic-rag/memory/store?fact=...&category=...
+
+# Limpiar sesión
+POST /api/agentic-rag/session/clear
+
+# Historial de consultas
+GET /api/agentic-rag/history
+```
+
+---
+
 ## 🧠 Marco de Razonamiento
 
 Cada agente implementa un marco de razonamiento profundo:
@@ -340,7 +411,4 @@ Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
 
 ---
 
-**Desarrollado con ❤️ usando CrewAI, FastAPI y Next.js**
-=======
-
->>>>>>> c87baecc3169cff7d8a25b166435b778b08b7ed2
+**Desarrollado con ❤️ usando CrewAI, FastAPI, Next.js y Google ADK**
