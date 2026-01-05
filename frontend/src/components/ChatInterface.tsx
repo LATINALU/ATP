@@ -16,6 +16,15 @@ interface AttachedFile {
   content: string;
 }
 
+interface AgentProgress {
+  agent_id: string;
+  agent_name: string;
+  status: "pending" | "processing" | "completed" | "error";
+  progress?: number;
+  current_step?: string;
+  result?: string;
+}
+
 interface Message {
   id: string;
   role: "user" | "assistant" | "system";
@@ -23,6 +32,9 @@ interface Message {
   timestamp: Date;
   agents?: string[];
   status?: "pending" | "processing" | "completed" | "error";
+  agentProgress?: AgentProgress[];
+  a2a_messages_count?: number;
+  a2a_responses_count?: number;
 }
 
 interface ChatInterfaceProps {
@@ -30,6 +42,8 @@ interface ChatInterfaceProps {
   onSendMessage: (message: string) => Promise<void>;
   messages: Message[];
   isProcessing: boolean;
+  currentAgentProgress?: AgentProgress[];
+  totalAgents: number;
 }
 
 export function ChatInterface({
@@ -37,6 +51,8 @@ export function ChatInterface({
   onSendMessage,
   messages,
   isProcessing,
+  currentAgentProgress = [],
+  totalAgents,
 }: ChatInterfaceProps) {
   const [input, setInput] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
@@ -161,8 +177,9 @@ export function ChatInterface({
         </div>
         <div className="flex items-center gap-2">
           <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-          <span className="text-xs text-muted-foreground">
-            {selectedAgents.length} agentes activos
+          <span className="text-xs text-muted-foreground font-semibold flex items-center gap-1">
+            <span className="text-emerald-400">✓</span>
+            {selectedAgents.length} / {totalAgents} activos
           </span>
         </div>
       </div>
@@ -245,16 +262,68 @@ export function ChatInterface({
               <div className="flex-shrink-0 h-8 w-8 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center">
                 <Bot className="h-4 w-4 text-primary animate-pulse" />
               </div>
-              <div className="bg-card border border-primary/20 rounded-xl px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-1">
-                    <div className="h-2 w-2 rounded-full bg-primary animate-bounce" />
-                    <div className="h-2 w-2 rounded-full bg-primary animate-bounce delay-100" />
-                    <div className="h-2 w-2 rounded-full bg-primary animate-bounce delay-200" />
+              <div className="bg-card border border-primary/20 rounded-xl px-4 py-3 min-w-[300px]">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 text-primary animate-spin" />
+                    <span className="text-sm font-semibold text-primary">
+                      LangGraph + A2A Protocol
+                    </span>
                   </div>
-                  <span className="text-sm text-muted-foreground">
-                    Agentes procesando...
-                  </span>
+                  
+                  {/* Agent Progress */}
+                  {currentAgentProgress.length > 0 ? (
+                    <div className="space-y-2">
+                      {currentAgentProgress.map((agent) => (
+                        <div key={agent.agent_id} className="space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-medium text-foreground">
+                              {agent.agent_name}
+                            </span>
+                            <Badge 
+                              variant="outline" 
+                              className={cn(
+                                "text-xs",
+                                agent.status === "processing" && "bg-yellow-500/20 text-yellow-500 border-yellow-500/50",
+                                agent.status === "completed" && "bg-green-500/20 text-green-500 border-green-500/50",
+                                agent.status === "error" && "bg-red-500/20 text-red-500 border-red-500/50",
+                                agent.status === "pending" && "bg-gray-500/20 text-gray-500 border-gray-500/50"
+                              )}
+                            >
+                              {agent.status === "processing" && "🔄 Procesando"}
+                              {agent.status === "completed" && "✅ Completado"}
+                              {agent.status === "error" && "❌ Error"}
+                              {agent.status === "pending" && "⏳ Pendiente"}
+                            </Badge>
+                          </div>
+                          {agent.current_step && (
+                            <p className="text-xs text-muted-foreground">
+                              {agent.current_step}
+                            </p>
+                          )}
+                          {agent.progress !== undefined && (
+                            <div className="w-full bg-primary/10 rounded-full h-1.5">
+                              <div 
+                                className="bg-primary h-1.5 rounded-full transition-all duration-300"
+                                style={{ width: `${agent.progress}%` }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-1">
+                        <div className="h-2 w-2 rounded-full bg-primary animate-bounce" />
+                        <div className="h-2 w-2 rounded-full bg-primary animate-bounce delay-100" />
+                        <div className="h-2 w-2 rounded-full bg-primary animate-bounce delay-200" />
+                      </div>
+                      <span className="text-sm text-muted-foreground">
+                        Inicializando agentes...
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

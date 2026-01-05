@@ -5,45 +5,45 @@ import { Handle, Position, NodeProps, useReactFlow } from 'reactflow';
 import { Bot, ChevronDown, Info } from 'lucide-react';
 
 const AGENTS_DATA = [
-  // Level 1 - Critical Thinking (6 agentes)
-  { name: "reasoning_agent", role: "Maestro de Razonamiento Lógico", level: 1, skills: ["Deducción", "Inducción", "Análisis lógico"], color: "#ef4444" },
-  { name: "planning_agent", role: "Estratega de Planificación", level: 1, skills: ["Gestión de proyectos", "Planificación estratégica"], color: "#ef4444" },
-  { name: "research_agent", role: "Investigador Senior", level: 1, skills: ["Investigación profunda", "Síntesis de información"], color: "#ef4444" },
-  { name: "analysis_agent", role: "Analista Experto", level: 1, skills: ["Descomposición de problemas", "Análisis de datos"], color: "#ef4444" },
-  { name: "synthesis_agent", role: "Integrador de Conocimiento", level: 1, skills: ["Integración de información", "Generación de insights"], color: "#ef4444" },
-  { name: "critical_thinking_agent", role: "Evaluador Crítico", level: 1, skills: ["Evaluación de argumentos", "Detección de falacias"], color: "#ef4444" },
+  // Level 1 - Critical (6 agentes)
+  { name: "reasoning", role: "Maestro de Razonamiento Lógico", level: 1, skills: ["Deducción", "Inducción", "Análisis lógico"], color: "#ef4444" },
+  { name: "planning", role: "Estratega de Planificación", level: 1, skills: ["Gestión de proyectos", "Planificación estratégica"], color: "#ef4444" },
+  { name: "research", role: "Investigador Senior", level: 1, skills: ["Investigación profunda", "Síntesis de información"], color: "#ef4444" },
+  { name: "analysis", role: "Analista Experto", level: 1, skills: ["Descomposición de problemas", "Análisis de datos"], color: "#ef4444" },
+  { name: "synthesis", role: "Integrador de Conocimiento", level: 1, skills: ["Integración de información", "Generación de insights"], color: "#ef4444" },
+  { name: "critical_thinking", role: "Evaluador Crítico", level: 1, skills: ["Evaluación de argumentos", "Detección de falacias"], color: "#ef4444" },
   
-  // Level 2 - Professional Skills (6 agentes)
-  { name: "coding_agent", role: "Ingeniero de Software Senior", level: 2, skills: ["Programación", "Arquitectura", "Debug"], color: "#f97316" },
-  { name: "writing_agent", role: "Escritor Profesional", level: 2, skills: ["Redacción", "Copywriting", "Storytelling"], color: "#f97316" },
-  { name: "data_agent", role: "Científico de Datos", level: 2, skills: ["Análisis de datos", "Estadística", "ML"], color: "#f97316" },
-  { name: "communication_agent", role: "Especialista en Comunicación", level: 2, skills: ["Comunicación efectiva", "Negociación"], color: "#f97316" },
-  { name: "decision_agent", role: "Estratega de Decisiones", level: 2, skills: ["Toma de decisiones", "Análisis de riesgos"], color: "#f97316" },
-  { name: "problem_solving_agent", role: "Solucionador Creativo", level: 2, skills: ["Resolución creativa", "Pensamiento lateral"], color: "#f97316" },
+  // Level 2 - Essential (6 agentes)
+  { name: "coding", role: "Ingeniero de Software Senior", level: 2, skills: ["Programación", "Arquitectura", "Debug"], color: "#f97316" },
+  { name: "data", role: "Científico de Datos", level: 2, skills: ["Análisis de datos", "Estadística", "ML"], color: "#f97316" },
+  { name: "writing", role: "Escritor Profesional", level: 2, skills: ["Redacción", "Copywriting", "Storytelling"], color: "#f97316" },
+  { name: "communication", role: "Especialista en Comunicación", level: 2, skills: ["Comunicación efectiva", "Negociación"], color: "#f97316" },
+  { name: "decision", role: "Estratega de Decisiones", level: 2, skills: ["Toma de decisiones", "Análisis de riesgos"], color: "#f97316" },
+  { name: "problem_solving", role: "Solucionador Creativo", level: 2, skills: ["Resolución creativa", "Pensamiento lateral"], color: "#f97316" },
   
   // Level 3 - Specialized (6 agentes)
-  { name: "creative_agent", role: "Director Creativo", level: 3, skills: ["Creatividad", "Innovación", "Diseño"], color: "#eab308" },
-  { name: "optimization_agent", role: "Optimizador de Procesos", level: 3, skills: ["Optimización", "Eficiencia", "Mejora continua"], color: "#eab308" },
-  { name: "quality_agent", role: "Especialista en Calidad", level: 3, skills: ["Control de calidad", "Testing", "Validación"], color: "#eab308" },
-  { name: "security_agent", role: "Experto en Seguridad", level: 3, skills: ["Seguridad", "Auditoría", "Protección"], color: "#eab308" },
-  { name: "marketing_agent", role: "Estratega de Marketing", level: 3, skills: ["Marketing digital", "SEO", "Branding"], color: "#eab308" },
-  { name: "design_agent", role: "Diseñador UX/UI", level: 3, skills: ["Diseño de interfaces", "UX", "Prototipado"], color: "#eab308" },
+  { name: "legal", role: "Asesor Legal", level: 3, skills: ["Análisis legal", "Cumplimiento", "Contratos"], color: "#eab308" },
+  { name: "financial", role: "Analista Financiero", level: 3, skills: ["Finanzas", "Valoración", "Inversiones"], color: "#eab308" },
+  { name: "creative", role: "Director Creativo", level: 3, skills: ["Creatividad", "Innovación", "Diseño"], color: "#eab308" },
+  { name: "technical", role: "Arquitecto Técnico", level: 3, skills: ["Arquitectura", "Sistemas", "Cloud"], color: "#eab308" },
+  { name: "educational", role: "Educador Experto", level: 3, skills: ["Pedagogía", "Enseñanza", "Diseño instruccional"], color: "#eab308" },
+  { name: "marketing", role: "Estratega de Marketing", level: 3, skills: ["Marketing digital", "SEO", "Branding"], color: "#eab308" },
   
   // Level 4 - Support (6 agentes)
-  { name: "documentation_agent", role: "Documentador Técnico", level: 4, skills: ["Documentación", "Tutoriales", "Guías"], color: "#22c55e" },
-  { name: "translation_agent", role: "Traductor Multilingüe", level: 4, skills: ["Traducción", "Localización", "Idiomas"], color: "#22c55e" },
-  { name: "formatting_agent", role: "Especialista en Formato", level: 4, skills: ["Formato", "Estilo", "Presentación"], color: "#22c55e" },
-  { name: "review_agent", role: "Revisor de Contenido", level: 4, skills: ["Revisión", "Edición", "Corrección"], color: "#22c55e" },
-  { name: "testing_agent", role: "Tester de Software", level: 4, skills: ["Testing", "QA", "Debugging"], color: "#22c55e" },
-  { name: "support_agent", role: "Agente de Soporte", level: 4, skills: ["Atención al cliente", "Resolución de problemas"], color: "#22c55e" },
+  { name: "qa", role: "Ingeniero de Calidad", level: 4, skills: ["Testing", "QA", "Calidad"], color: "#22c55e" },
+  { name: "documentation", role: "Documentador Técnico", level: 4, skills: ["Documentación", "Tutoriales", "Guías"], color: "#22c55e" },
+  { name: "optimization", role: "Optimizador de Performance", level: 4, skills: ["Optimización", "Eficiencia", "Performance"], color: "#22c55e" },
+  { name: "security", role: "Experto en Seguridad", level: 4, skills: ["Seguridad", "Auditoría", "Protección"], color: "#22c55e" },
+  { name: "integration", role: "Arquitecto de Integraciones", level: 4, skills: ["APIs", "Integraciones", "ETL"], color: "#22c55e" },
+  { name: "review", role: "Revisor Experto", level: 4, skills: ["Revisión", "Feedback", "Mejora"], color: "#22c55e" },
   
   // Level 5 - Auxiliary (6 agentes)
-  { name: "summarization_agent", role: "Resumidor Experto", level: 5, skills: ["Resumen", "Síntesis", "Compresión"], color: "#3b82f6" },
-  { name: "validation_agent", role: "Validador de Datos", level: 5, skills: ["Validación", "Verificación", "Chequeo"], color: "#3b82f6" },
-  { name: "extraction_agent", role: "Extractor de Información", level: 5, skills: ["Extracción", "Parsing", "Análisis"], color: "#3b82f6" },
-  { name: "classification_agent", role: "Clasificador de Datos", level: 5, skills: ["Clasificación", "Categorización", "Etiquetado"], color: "#3b82f6" },
-  { name: "conversion_agent", role: "Conversor de Formatos", level: 5, skills: ["Conversión", "Transformación", "Adaptación"], color: "#3b82f6" },
-  { name: "monitoring_agent", role: "Monitor de Procesos", level: 5, skills: ["Monitoreo", "Seguimiento", "Alertas"], color: "#3b82f6" },
+  { name: "translation", role: "Traductor Profesional", level: 5, skills: ["Traducción", "Localización", "Idiomas"], color: "#3b82f6" },
+  { name: "summary", role: "Especialista en Resumen", level: 5, skills: ["Resumen", "Síntesis", "Compresión"], color: "#3b82f6" },
+  { name: "formatting", role: "Especialista en Formato", level: 5, skills: ["Formato", "Estilo", "Presentación"], color: "#3b82f6" },
+  { name: "validation", role: "Validador de Datos", level: 5, skills: ["Validación", "Verificación", "Chequeo"], color: "#3b82f6" },
+  { name: "coordination", role: "Coordinador de Flujos", level: 5, skills: ["Coordinación", "Gestión", "Workflows"], color: "#3b82f6" },
+  { name: "explanation", role: "Explicador Experto", level: 5, skills: ["Explicación", "Clarificación", "Enseñanza"], color: "#3b82f6" },
 ];
 
 export default memo(({ data, id, selected }: NodeProps) => {

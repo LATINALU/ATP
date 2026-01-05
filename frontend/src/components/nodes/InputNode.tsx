@@ -37,7 +37,7 @@ export default memo(({ data, id }: NodeProps) => {
         value={inputText}
         onChange={(e) => handleTextChange(e.target.value)}
         className="w-full text-xs bg-background border border-border rounded p-2"
-        placeholder="Enter your input here..."
+        placeholder="Describe la consulta del usuario..."
         rows={4}
       />
       
@@ -50,7 +50,7 @@ export default memo(({ data, id }: NodeProps) => {
           className="!w-3 !h-3 !bg-cyan-500 !relative !transform-none"
           style={{ position: 'relative' }}
         />
-        <div className="text-[10px] text-muted-foreground ml-2">Start</div>
+        <div className="text-[10px] text-muted-foreground ml-2">User Query</div>
       </div>
     </div>
   );

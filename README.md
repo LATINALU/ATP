@@ -1,17 +1,21 @@
-# ATP - Agentes de Tareas Polivalentes
+# Agentic Task Platform (ATP)
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.0.0-green.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-0.6.1-orange.svg" alt="Version">
+  <img src="https://img.shields.io/badge/status-alpha-yellow.svg" alt="Status">
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
-  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">
   <img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python">
-  <img src="https://img.shields.io/badge/next.js-14-black.svg" alt="Next.js">
-  <img src="https://img.shields.io/badge/ReactFlow-11+-purple.svg" alt="ReactFlow">
+  <img src="https://img.shields.io/badge/LangGraph-0.2+-green.svg" alt="LangGraph">
+  <img src="https://img.shields.io/badge/A2A_Protocol-Implemented-purple.svg" alt="A2A Protocol">
 </p>
 
-Sistema de **30 Agentes de IA** con OpenAI SDK, organizados en 5 niveles de importancia, con **Node Workflow Editor** profesional para crear flujos de trabajo visuales complejos.
+## 🎯 Sistema de Agentes Especializados de Última Generación
 
-> **v2.0.0 - Node Workflow System**: Sistema completamente rediseñado con editor de nodos visual, 30 agentes organizados en 5 niveles, validación de conexiones por colores, 10 temas profesionales, y soporte multiidioma (ES/EN).
+**Arquitectura profesional diseñada por desarrollador senior con 30+ años de experiencia.**
+
+ATP es una plataforma de agentes de IA altamente especializados que utiliza **LangGraph** para orquestación inteligente y el **protocolo A2A** (Agent-to-Agent) para comunicación estructurada. Cada agente es una "supercomputadora única" con capacidades específicas y expertise de nivel master.
+
+> **v0.6.1 - Alpha Release**: Refactorización completa del sistema. Migración de CrewAI a LangGraph con protocolo A2A. Arquitectura modular, escalable y mantenible. Sistema en desarrollo activo.
 
 ## 🚀 Características Principales
 

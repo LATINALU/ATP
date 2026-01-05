@@ -15,13 +15,37 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import AgentNode from '@/components/nodes/AgentNode';
-import PromptNode from '@/components/nodes/PromptNode';
-import AIProviderNode from '@/components/nodes/AIProviderNode';
-import OutputBaseNode from '@/components/nodes/OutputBaseNode';
-import OutputFinalNode from '@/components/nodes/OutputFinalNode';
+import UserQueryNode from "@/components/nodes/UserQueryNode";
+import LangGraphNode from "@/components/nodes/LangGraphNode";
+import A2AMessageNode from "@/components/nodes/A2AMessageNode";
+import AgentsClusterNode from "@/components/nodes/AgentsClusterNode";
+import A2AResponsesNode from "@/components/nodes/A2AResponsesNode";
+import SynthesisNode from "@/components/nodes/SynthesisNode";
+import FinalResultNode from "@/components/nodes/FinalResultNode";
 
-import { Bot, MessageSquare, Cpu, Keyboard, FileOutput, Play, Save, FolderOpen, LayoutGrid, Home, Trash2, Loader2, Upload, Download, Palette } from 'lucide-react';
+import {
+  Bot,
+  MessageSquare,
+  Cpu,
+  Keyboard,
+  FileOutput,
+  Play,
+  Save,
+  FolderOpen,
+  LayoutGrid,
+  Home,
+  Trash2,
+  Loader2,
+  Upload,
+  Download,
+  Palette,
+  Workflow,
+  RadioTower,
+  Layers3,
+  Inbox,
+  Sparkles,
+  Trophy,
+} from "lucide-react";
 import Link from 'next/link';
 import { WorkflowExecutor } from '@/lib/workflowExecutor';
 import { ThemeSelector } from '@/components/ThemeSelector';
@@ -29,23 +53,57 @@ import { LanguageSelector } from '@/components/LanguageSelector';
 import { getCurrentLanguage, getTranslation } from '@/lib/i18n';
 
 const nodeTypes = {
-  prompt: PromptNode,
-  agent_l1: AgentNode,
-  agent_l2: AgentNode,
-  agent_l3: AgentNode,
-  agent_l4: AgentNode,
-  agent_l5: AgentNode,
-  ai_provider: AIProviderNode,
-  output_base: OutputBaseNode,
-  output_final: OutputFinalNode,
+  user_query: UserQueryNode,
+  langgraph: LangGraphNode,
+  a2a_message: A2AMessageNode,
+  agents_cluster: AgentsClusterNode,
+  a2a_responses: A2AResponsesNode,
+  synthesis: SynthesisNode,
+  final_result: FinalResultNode,
 };
 
 const initialNodes = [
   {
-    id: '1',
-    type: 'prompt',
-    data: { label: 'Prompt Principal', type: 'prompt' },
-    position: { x: 50, y: 100 },
+    id: "1",
+    type: "user_query",
+    data: { label: "User Query Intake", type: "user_query" },
+    position: { x: 0, y: 80 },
+  },
+  {
+    id: "2",
+    type: "langgraph",
+    data: { label: "LangGraph StateGraph", type: "langgraph" },
+    position: { x: 0, y: 280 },
+  },
+  {
+    id: "3",
+    type: "a2a_message",
+    data: { label: "A2A Message Broadcast", type: "a2a_message" },
+    position: { x: 0, y: 480 },
+  },
+  {
+    id: "4",
+    type: "agents_cluster",
+    data: { label: "Agents Cluster", type: "agents_cluster" },
+    position: { x: 350, y: 480 },
+  },
+  {
+    id: "5",
+    type: "a2a_responses",
+    data: { label: "A2A Responses Collector", type: "a2a_responses" },
+    position: { x: 350, y: 680 },
+  },
+  {
+    id: "6",
+    type: "synthesis",
+    data: { label: "Synthesis Engine", type: "synthesis" },
+    position: { x: 350, y: 880 },
+  },
+  {
+    id: "7",
+    type: "final_result",
+    data: { label: "Final Result", type: "final_result" },
+    position: { x: 350, y: 1080 },
   },
 ];
 
@@ -54,7 +112,7 @@ const initialEdges: Edge[] = [];
 export default function NodesPage() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [nodeIdCounter, setNodeIdCounter] = useState(3);
+  const [nodeIdCounter, setNodeIdCounter] = useState(initialNodes.length + 1);
   const [isRunning, setIsRunning] = useState(false);
   const [currentLang, setCurrentLang] = useState(getCurrentLanguage());
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -63,75 +121,67 @@ export default function NodesPage() {
 
   const onConnect = useCallback(
     (params: Connection) => {
-      const sourceNode = nodes.find(n => n.id === params.source);
-      const targetNode = nodes.find(n => n.id === params.target);
-      
+      const sourceNode = nodes.find((n) => n.id === params.source);
+      const targetNode = nodes.find((n) => n.id === params.target);
       if (!sourceNode || !targetNode) return;
 
-      // Validación de conexiones con handles específicos
-      const sourceHandle = params.sourceHandle || '';
-      const targetHandle = params.targetHandle || '';
-      
-      // Reglas de validación por tipo y handle
-      const isValidConnection = () => {
-        // Prompt (salida morada) → Agent (entrada morada)
-        if (sourceNode.type === 'prompt' && sourceHandle === 'output') {
-          return ['agent_l1', 'agent_l2', 'agent_l3', 'agent_l4', 'agent_l5'].includes(targetNode.type || '') 
-                 && targetHandle === 'input-prompt';
-        }
-        
-        // Agent (salida azul) → Output Base (entrada azul)
-        if (['agent_l1', 'agent_l2', 'agent_l3', 'agent_l4', 'agent_l5'].includes(sourceNode.type || '') 
-            && sourceHandle === 'output') {
-          return targetNode.type === 'output_base' && targetHandle === 'input';
-        }
-        
-        // AI Provider (salida naranja) → Agent (entrada naranja)
-        if (sourceNode.type === 'ai_provider' && sourceHandle === 'output') {
-          return ['agent_l1', 'agent_l2', 'agent_l3', 'agent_l4', 'agent_l5'].includes(targetNode.type || '')
-                 && targetHandle === 'input-ai';
-        }
-        
-        // Output Base (salida morada) → Agent (entrada morada) o Output Final (entrada azul)
-        if (sourceNode.type === 'output_base' && sourceHandle === 'output') {
-          if (['agent_l1', 'agent_l2', 'agent_l3', 'agent_l4', 'agent_l5'].includes(targetNode.type || '')) {
-            return targetHandle === 'input-prompt';
-          }
-          if (targetNode.type === 'output_final') {
-            return targetHandle === 'input';
-          }
-        }
-        
-        return false;
-      };
-      
-      if (!isValidConnection()) {
-        alert(`❌ Conexión no válida\n\nReglas de conexión:\n🟣 Prompt (morado) → Agent entrada morada\n🔵 Agent (azul) → Output Base entrada azul\n🟠 AI Provider (naranja) → Agent entrada naranja\n🟣 Output Base (morado) → Agent entrada morada o Output Final\n\nVerifica los colores de los handles!`);
+      const flowRules = [
+        {
+          from: { type: "user_query", handle: "query-out" },
+          to: { type: "langgraph", handle: "lg-input" },
+          color: "#22d3ee",
+        },
+        {
+          from: { type: "langgraph", handle: "lg-output" },
+          to: { type: "a2a_message", handle: "a2a-in" },
+          color: "#d946ef",
+        },
+        {
+          from: { type: "a2a_message", handle: "a2a-out" },
+          to: { type: "agents_cluster", handle: "agents-in" },
+          color: "#fbbf24",
+        },
+        {
+          from: { type: "agents_cluster", handle: "agents-out" },
+          to: { type: "a2a_responses", handle: "responses-in" },
+          color: "#38bdf8",
+        },
+        {
+          from: { type: "a2a_responses", handle: "responses-out" },
+          to: { type: "synthesis", handle: "synthesis-in" },
+          color: "#818cf8",
+        },
+        {
+          from: { type: "synthesis", handle: "synthesis-out" },
+          to: { type: "final_result", handle: "final-in" },
+          color: "#c084fc",
+        },
+      ];
+
+      const isAllowed = flowRules.find(
+        (rule) =>
+          rule.from.type === sourceNode.type &&
+          rule.from.handle === (params.sourceHandle || "") &&
+          rule.to.type === targetNode.type &&
+          rule.to.handle === (params.targetHandle || ""),
+      );
+
+      if (!isAllowed) {
+        alert(
+          "❌ Conexión no válida. Sigue el flujo:\n1. User Query (cyan) → LangGraph (fucsia)\n2. LangGraph → A2A Messages (ámbar)\n3. A2A Messages → Agents Cluster (azul)\n4. Agents → A2A Responses (índigo)\n5. Responses → Synthesis (violeta)\n6. Synthesis → Final Result (verde)\nVerifica los colores de los handles.",
+        );
         return;
       }
 
-      // Asignar colores según el tipo de conexión
-      let edgeStyle = { stroke: '#10b981', strokeWidth: 2 };
-      
-      if (sourceNode.type === 'prompt') {
-        edgeStyle = { stroke: '#a855f7', strokeWidth: 2 }; // Purple
-      } else if (sourceNode.type === 'ai_provider') {
-        edgeStyle = { stroke: '#f97316', strokeWidth: 2 }; // Orange
-      } else if (sourceNode.type?.startsWith('agent_')) {
-        edgeStyle = { stroke: '#10b981', strokeWidth: 2 }; // Green
-      } else if (sourceNode.type === 'output_base') {
-        edgeStyle = { stroke: '#3b82f6', strokeWidth: 2 }; // Blue
-      }
-      
       const newEdge = {
         ...params,
-        style: edgeStyle,
+        style: { stroke: isAllowed.color, strokeWidth: 2 },
         animated: true,
       };
-      
+
       setEdges((eds) => addEdge(newEdge, eds));
     },
-    [setEdges, nodes]
+    [nodes, setEdges],
   );
 
   const addNode = (type: string) => {
@@ -145,31 +195,76 @@ export default function NodesPage() {
       },
     };
     setNodes((nds) => nds.concat(newNode));
-    setNodeIdCounter(nodeIdCounter + 1);
+    setNodeIdCounter((prev) => prev + 1);
   };
 
   const getNodeLabel = (type: string) => {
     switch (type) {
-      case 'prompt': return 'Prompt Principal';
-      case 'agent_l1': return 'Agent Level 1';
-      case 'agent_l2': return 'Agent Level 2';
-      case 'agent_l3': return 'Agent Level 3';
-      case 'agent_l4': return 'Agent Level 4';
-      case 'agent_l5': return 'Agent Level 5';
-      case 'ai_provider': return 'AI Provider';
-      case 'output_base': return 'Output Base';
-      case 'output_final': return 'Output Final';
-      default: return 'Node';
+      case "user_query":
+        return "User Query Intake";
+      case "langgraph":
+        return "LangGraph StateGraph";
+      case "a2a_message":
+        return "A2A Message Dispatch";
+      case "agents_cluster":
+        return "Agents Cluster";
+      case "a2a_responses":
+        return "A2A Responses Collector";
+      case "synthesis":
+        return "Synthesis Engine";
+      case "final_result":
+        return "Final Result";
+      default:
+        return "Node";
     }
   };
 
   const clearWorkflow = () => {
     setNodes(initialNodes);
     setEdges([]);
-    setNodeIdCounter(3);
+    setNodeIdCounter(initialNodes.length + 1);
+  };
+
+  const validatePipeline = () => {
+    const requiredSteps = [
+      { type: "user_query", label: "User Query" },
+      { type: "langgraph", label: "LangGraph StateGraph" },
+      { type: "a2a_message", label: "A2A Message Dispatch" },
+      { type: "agents_cluster", label: "Agents Cluster" },
+      { type: "a2a_responses", label: "A2A Responses Collector" },
+      { type: "synthesis", label: "Synthesis Engine" },
+      { type: "final_result", label: "Final Result" },
+    ];
+
+    const missing = requiredSteps
+      .filter((step) => !nodes.some((node) => node.type === step.type))
+      .map((step) => step.label);
+
+    const errors: string[] = [];
+    if (missing.length > 0) {
+      errors.push(`Faltan nodos obligatorios: ${missing.join(", ")}.`);
+    }
+
+    const agentsNode = nodes.find((node) => node.type === "agents_cluster");
+    const agentsData = agentsNode?.data as { selectedAgents?: string[] } | undefined;
+    const selectedAgents = Array.isArray(agentsData?.selectedAgents)
+      ? agentsData?.selectedAgents
+      : [];
+
+    if (!selectedAgents || selectedAgents.length === 0) {
+      errors.push("Configura al menos un agente en el nodo Agents Cluster.");
+    }
+
+    return { valid: errors.length === 0, errors };
   };
 
   const runWorkflow = async () => {
+    const validation = validatePipeline();
+    if (!validation.valid) {
+      alert(`⚠️ Antes de ejecutar:\n${validation.errors.join("\n")}`);
+      return;
+    }
+
     setIsRunning(true);
     
     try {
@@ -358,166 +453,137 @@ export default function NodesPage() {
       {/* Main Canvas */}
       <div className="h-[calc(100vh-3.5rem)] flex">
         {/* Sidebar - Node Palette */}
-        <div className="w-64 bg-card border-r border-border p-4 overflow-y-auto max-h-[calc(100vh-3.5rem)]">
-          <h3 className="font-bold mb-4 text-sm uppercase text-muted-foreground">Add Nodes</h3>
+        <div className="w-72 bg-card border-r border-border p-4 overflow-y-auto max-h-[calc(100vh-3.5rem)]">
+          <h3 className="font-bold mb-4 text-sm uppercase text-muted-foreground">Add Workflow Nodes</h3>
           
-          <div className="space-y-2 overflow-y-auto max-h-[calc(100vh-20rem)] pb-4">
+          <div className="space-y-3 overflow-y-auto max-h-[calc(100vh-18rem)] pb-4">
             <button
-              onClick={() => addNode('prompt')}
-              className="w-full flex items-center gap-3 p-3 bg-background border-2 border-purple-500/50 rounded hover:bg-muted transition-colors"
+              onClick={() => addNode("user_query")}
+              className="w-full flex items-center gap-3 p-3 bg-background border-2 border-cyan-400/60 rounded-xl hover:bg-muted transition-colors"
             >
-              <MessageSquare className="h-5 w-5 text-purple-500" />
+              <Keyboard className="h-5 w-5 text-cyan-400" />
               <div className="text-left">
-                <div className="font-semibold text-sm">Prompt Principal</div>
-                <div className="text-xs text-muted-foreground">+/- prompts</div>
+                <div className="font-semibold text-sm">User Query Intake</div>
+                <div className="text-xs text-muted-foreground">Contexto + Persona + Urgencia</div>
               </div>
             </button>
 
             <button
-              onClick={() => addNode('agent_l1')}
-              className="w-full flex items-center gap-3 p-3 bg-background border-2 border-red-500/50 rounded hover:bg-muted transition-colors"
+              onClick={() => addNode("langgraph")}
+              className="w-full flex items-center gap-3 p-3 bg-background border-2 border-fuchsia-400/60 rounded-xl hover:bg-muted transition-colors"
             >
-              <Bot className="h-5 w-5 text-red-500" />
+              <Workflow className="h-5 w-5 text-fuchsia-400" />
               <div className="text-left">
-                <div className="font-semibold text-sm">Agent LVL 1</div>
-                <div className="text-xs text-muted-foreground">Critical (6 agentes)</div>
+                <div className="font-semibold text-sm">LangGraph StateGraph</div>
+                <div className="text-xs text-muted-foreground">Estrategia + Modelo + Paralelismo</div>
               </div>
             </button>
 
             <button
-              onClick={() => addNode('agent_l2')}
-              className="w-full flex items-center gap-3 p-3 bg-background border-2 border-orange-500/50 rounded hover:bg-muted transition-colors"
+              onClick={() => addNode("a2a_message")}
+              className="w-full flex items-center gap-3 p-3 bg-background border-2 border-amber-400/60 rounded-xl hover:bg-muted transition-colors"
             >
-              <Bot className="h-5 w-5 text-orange-500" />
+              <RadioTower className="h-5 w-5 text-amber-300" />
               <div className="text-left">
-                <div className="font-semibold text-sm">Agent LVL 2</div>
-                <div className="text-xs text-muted-foreground">Professional (6 agentes)</div>
+                <div className="font-semibold text-sm">A2A Message Dispatch</div>
+                <div className="text-xs text-muted-foreground">Canal + Prioridad + Payload</div>
               </div>
             </button>
 
             <button
-              onClick={() => addNode('agent_l3')}
-              className="w-full flex items-center gap-3 p-3 bg-background border-2 border-yellow-500/50 rounded hover:bg-muted transition-colors"
+              onClick={() => addNode("agents_cluster")}
+              className="w-full flex items-center gap-3 p-3 bg-background border-2 border-sky-400/60 rounded-xl hover:bg-muted transition-colors"
             >
-              <Bot className="h-5 w-5 text-yellow-500" />
+              <Layers3 className="h-5 w-5 text-sky-300" />
               <div className="text-left">
-                <div className="font-semibold text-sm">Agent LVL 3</div>
-                <div className="text-xs text-muted-foreground">Specialized (6 agentes)</div>
+                <div className="font-semibold text-sm">Agents Cluster</div>
+                <div className="text-xs text-muted-foreground">Selección multi-nivel + Concurrencia</div>
               </div>
             </button>
 
             <button
-              onClick={() => addNode('agent_l4')}
-              className="w-full flex items-center gap-3 p-3 bg-background border-2 border-green-500/50 rounded hover:bg-muted transition-colors"
+              onClick={() => addNode("a2a_responses")}
+              className="w-full flex items-center gap-3 p-3 bg-background border-2 border-indigo-400/60 rounded-xl hover:bg-muted transition-colors"
             >
-              <Bot className="h-5 w-5 text-green-500" />
+              <Inbox className="h-5 w-5 text-indigo-300" />
               <div className="text-left">
-                <div className="font-semibold text-sm">Agent LVL 4</div>
-                <div className="text-xs text-muted-foreground">Support (6 agentes)</div>
+                <div className="font-semibold text-sm">A2A Responses Collector</div>
+                <div className="text-xs text-muted-foreground">Conteo de respuestas + Timeout</div>
               </div>
             </button>
 
             <button
-              onClick={() => addNode('agent_l5')}
-              className="w-full flex items-center gap-3 p-3 bg-background border-2 border-blue-500/50 rounded hover:bg-muted transition-colors"
+              onClick={() => addNode("synthesis")}
+              className="w-full flex items-center gap-3 p-3 bg-background border-2 border-violet-400/60 rounded-xl hover:bg-muted transition-colors"
             >
-              <Bot className="h-5 w-5 text-blue-500" />
+              <Sparkles className="h-5 w-5 text-violet-300" />
               <div className="text-left">
-                <div className="font-semibold text-sm">Agent LVL 5</div>
-                <div className="text-xs text-muted-foreground">Auxiliary (6 agentes)</div>
+                <div className="font-semibold text-sm">Synthesis Engine</div>
+                <div className="text-xs text-muted-foreground">Estrategia + Tono + Traza</div>
               </div>
             </button>
 
             <button
-              onClick={() => addNode('ai_provider')}
-              className="w-full flex items-center gap-3 p-3 bg-background border border-border rounded hover:bg-muted transition-colors"
+              onClick={() => addNode("final_result")}
+              className="w-full flex items-center gap-3 p-3 bg-background border-2 border-emerald-400/60 rounded-xl hover:bg-muted transition-colors"
             >
-              <Cpu className="h-5 w-5 text-orange-500" />
+              <Trophy className="h-5 w-5 text-emerald-300" />
               <div className="text-left">
-                <div className="font-semibold text-sm">AI Provider</div>
-                <div className="text-xs text-muted-foreground">Model config</div>
-              </div>
-            </button>
-
-            <button
-              onClick={() => addNode('output_base')}
-              className="w-full flex items-center gap-3 p-3 bg-background border-2 border-blue-500/50 rounded hover:bg-muted transition-colors"
-            >
-              <FileOutput className="h-5 w-5 text-blue-500" />
-              <div className="text-left">
-                <div className="font-semibold text-sm">Output Base</div>
-                <div className="text-xs text-muted-foreground">Intermediate result</div>
-              </div>
-            </button>
-
-            <button
-              onClick={() => addNode('output_final')}
-              className="w-full flex items-center gap-3 p-3 bg-background border-2 border-green-500/50 rounded hover:bg-muted transition-colors"
-            >
-              <FileOutput className="h-5 w-5 text-green-500" />
-              <div className="text-left">
-                <div className="font-semibold text-sm">Output Final</div>
-                <div className="text-xs text-muted-foreground">Final result</div>
+                <div className="font-semibold text-sm">Final Result</div>
+                <div className="text-xs text-muted-foreground">Output final + Export/Share</div>
               </div>
             </button>
           </div>
 
-          <div className="mt-6 p-3 bg-muted rounded text-xs">
-            <p className="font-semibold mb-2">{t('howToUse')}:</p>
-            <ul className="space-y-1 text-muted-foreground">
-              <li>• {t('clickNodesToAdd')}</li>
-              <li>• {t('dragToConnect')}</li>
-              <li>• {t('clickToConfig')}</li>
-              <li>• {t('runToExecute')}</li>
-            </ul>
-            
-            <p className="font-semibold mb-2 mt-4">🎨 Connection Colors:</p>
-            <ul className="space-y-1.5">
-              <li className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#a855f7' }}></div>
-                <span className="text-[10px]">Prompt → Agent (Purple)</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#10b981' }}></div>
-                <span className="text-[10px]">Agent → AI/Output (Green)</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#f97316' }}></div>
-                <span className="text-[10px]">AI Provider → Agent (Orange)</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#3b82f6' }}></div>
-                <span className="text-[10px]">Output Base → Agent/Final (Blue)</span>
-              </li>
-            </ul>
-            
-            <p className="font-semibold mb-2 mt-4">📊 Agent Levels:</p>
-            <ul className="space-y-1">
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                <span className="text-[10px]">L1 - Critical (6)</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-orange-500"></div>
-                <span className="text-[10px]">L2 - Professional (6)</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-                <span className="text-[10px]">L3 - Specialized (6)</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                <span className="text-[10px]">L4 - Support (6)</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                <span className="text-[10px]">L5 - Auxiliary (6)</span>
-              </li>
-            </ul>
-            
-            <p className="text-[10px] text-muted-foreground mt-3 italic">
-              ⚠️ {currentLang === 'es' ? 'Solo se permiten conexiones válidas' : 'Only valid connections are allowed'}
-            </p>
+          <div className="mt-6 p-4 bg-muted/60 rounded-xl text-xs space-y-3 border border-border/60">
+            <div>
+              <p className="font-semibold mb-2">{t("howToUse")}:</p>
+              <ul className="space-y-1 text-muted-foreground">
+                <li>1. Añade los nodos en orden del flujo oficial.</li>
+                <li>2. Configura cada etapa (inputs, estrategia, agentes).</li>
+                <li>3. Conecta siguiendo los colores de los handles.</li>
+                <li>4. Pulsa “Run Workflow” para ejecutar todo el pipeline.</li>
+              </ul>
+            </div>
+
+            <div>
+              <p className="font-semibold mb-2">🎨 Connection Colors</p>
+              <ul className="space-y-1.5 text-muted-foreground">
+                <li className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#22d3ee" }}></div>
+                  <span className="text-[10px]">Cyan · User Query → LangGraph</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#d946ef" }}></div>
+                  <span className="text-[10px]">Fuchsia · LangGraph → A2A Messages</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#fbbf24" }}></div>
+                  <span className="text-[10px]">Amber · A2A Messages → Agents Cluster</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#38bdf8" }}></div>
+                  <span className="text-[10px]">Sky · Agents → A2A Responses</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#818cf8" }}></div>
+                  <span className="text-[10px]">Indigo · Responses → Synthesis</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#c084fc" }}></div>
+                  <span className="text-[10px]">Violet · Synthesis → Final Result</span>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <p className="font-semibold mb-2">⚠️ Validaciones</p>
+              <ul className="space-y-1 text-muted-foreground">
+                <li>• Todos los nodos del flujo son obligatorios.</li>
+                <li>• Debes seleccionar al menos un agente en el Agents Cluster.</li>
+                <li>• Solo se permiten conexiones en el orden real del backend.</li>
+              </ul>
+            </div>
           </div>
         </div>
 

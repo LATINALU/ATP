@@ -10,6 +10,15 @@ export interface AgentDialogue {
   timestamp: Date;
 }
 
+export interface AgentProgress {
+  agent_id: string;
+  agent_name: string;
+  status: "pending" | "processing" | "completed" | "error";
+  progress?: number;
+  current_step?: string;
+  result?: string;
+}
+
 export interface Message {
   id: string;
   role: "user" | "assistant" | "system";
@@ -18,4 +27,7 @@ export interface Message {
   agents?: string[];
   status?: "pending" | "processing" | "completed" | "error";
   dialogues?: AgentDialogue[];
+  agentProgress?: AgentProgress[];
+  a2a_messages_count?: number;
+  a2a_responses_count?: number;
 }

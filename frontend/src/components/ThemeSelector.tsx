@@ -46,9 +46,9 @@ const themes: Theme[] = [
   {
     id: "corporate",
     name: "Corporate",
-    description: "Profesional azul/gris",
+    description: "Directivo azul grafito",
     icon: <Briefcase className="h-4 w-4" />,
-    preview: { bg: "#f5f7fa", primary: "#0066cc", accent: "#4a90e2" },
+    preview: { bg: "#0b1a2a", primary: "#1e86ff", accent: "#3dd5ff" },
   },
   {
     id: "gamer",

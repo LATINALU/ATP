@@ -5,6 +5,12 @@
 @layer base {
   :root {
     --radius: 0.5rem;
+    --app-background: hsl(var(--background));
+    --panel-border-color: hsla(var(--border) / 0.45);
+    --panel-glow: 0 0 0 rgba(0, 0, 0, 0);
+    --selector-bg: rgba(15, 23, 42, 0.95);
+    --selector-border: rgba(148, 163, 184, 0.4);
+    --selector-shadow: 0 20px 45px rgba(2, 6, 23, 0.6);
   }
 }
 
@@ -13,9 +19,18 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    background: var(--app-background, hsl(var(--background)));
+    color: hsl(var(--foreground));
     font-feature-settings: "rlig" 1, "calt" 1;
+    transition: background 0.6s ease, color 0.2s ease;
   }
+}
+
+.app-shell {
+  background: var(--app-background, hsl(var(--background)));
+  border: 1px solid var(--panel-border-color);
+  box-shadow: var(--panel-glow);
+  transition: background 0.6s ease, box-shadow 0.6s ease, border-color 0.4s ease;
 }
 
 /* Matrix rain effect */
@@ -176,6 +191,25 @@
 .status-error {
   @apply bg-red-500;
   box-shadow: 0 0 10px #ff0040;
+}
+
+.theme-selector-trigger {
+  border: 1px solid var(--selector-border);
+  box-shadow: var(--selector-shadow);
+  background: var(--selector-bg);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.2s ease;
+}
+
+.theme-selector-trigger:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 25px 55px rgba(15, 23, 42, 0.45);
+}
+
+.theme-selector-panel {
+  border: 1px solid var(--selector-border);
+  background: var(--selector-bg);
+  box-shadow: var(--selector-shadow);
+  backdrop-filter: blur(18px);
 }
 
 /* Import themes - MUST be at the end to override base variables */

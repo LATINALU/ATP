@@ -1,6 +1,7 @@
 """
-ATP Backend - FastAPI Server v1.0.1
-Servidor principal para el sistema de agentes ATP con Agentic RAG
+ATP Backend - FastAPI Server v0.6.6
+Servidor principal para el sistema de agentes ATP con LangGraph y Protocolo A2A
+Sistema de 30 Agentes Especializados - Professional UI/UX
 """
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,33 +15,64 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.config import CORS_ORIGINS, MODELS, HOST, PORT
 from app.models import ChatRequest, ChatResponse, HealthResponse, AgentInfo
-from app.agent_service import AgentService, AGENT_DEFINITIONS
 from app.api_models import fetch_available_models, get_model_description
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 
-# Importar sistema Agentic RAG
-try:
-    from agentic_rag import CentralAgent, get_central_agent
-    AGENTIC_RAG_AVAILABLE = True
-except ImportError:
-    AGENTIC_RAG_AVAILABLE = False
-    print("⚠️ Agentic RAG no disponible - usando modo legacy")
+# Importar nuevo sistema de agentes con LangGraph
+from app.orchestrator import AgentOrchestrator
+from app.agents import (
+    ReasoningAgent, PlanningAgent, ResearchAgent, AnalysisAgent, SynthesisAgent,
+    CriticalThinkingAgent, CodingAgent, DataAgent, WritingAgent, CommunicationAgent,
+    DecisionAgent, ProblemSolvingAgent, LegalAgent, FinancialAgent, CreativeAgent,
+    TechnicalAgent, EducationalAgent, MarketingAgent, QAAgent, DocumentationAgent,
+    OptimizationAgent, SecurityAgent, IntegrationAgent, ReviewAgent, TranslationAgent,
+    SummaryAgent, FormattingAgent, ValidationAgent, CoordinationAgent, ExplanationAgent
+)
+
+# Definiciones de los 30 agentes
+AGENT_DEFINITIONS = {
+    "reasoning": {"name": "Reasoning Agent", "level": 1, "description": "Razonamiento lógico multi-paradigma"},
+    "planning": {"name": "Planning Agent", "level": 1, "description": "Planificación estratégica y gestión de proyectos"},
+    "research": {"name": "Research Agent", "level": 1, "description": "Investigación académica rigurosa"},
+    "analysis": {"name": "Analysis Agent", "level": 1, "description": "Descomposición de problemas complejos"},
+    "synthesis": {"name": "Synthesis Agent", "level": 1, "description": "Integración de conocimiento e insights"},
+    "critical_thinking": {"name": "Critical Thinking Agent", "level": 1, "description": "Evaluación crítica y detección de falacias"},
+    "coding": {"name": "Coding Agent", "level": 2, "description": "Desarrollo de software y arquitectura"},
+    "data": {"name": "Data Agent", "level": 2, "description": "Ciencia de datos y análisis cuantitativo"},
+    "writing": {"name": "Writing Agent", "level": 2, "description": "Escritura profesional y contenido"},
+    "communication": {"name": "Communication Agent", "level": 2, "description": "Comunicación efectiva y resolución de conflictos"},
+    "decision": {"name": "Decision Agent", "level": 2, "description": "Análisis de decisiones y teoría de juegos"},
+    "problem_solving": {"name": "Problem Solving Agent", "level": 2, "description": "Solución creativa con TRIZ y Design Thinking"},
+    "legal": {"name": "Legal Agent", "level": 3, "description": "Análisis legal y cumplimiento normativo"},
+    "financial": {"name": "Financial Agent", "level": 3, "description": "Análisis financiero y valoración"},
+    "creative": {"name": "Creative Agent", "level": 3, "description": "Pensamiento creativo e innovación"},
+    "technical": {"name": "Technical Agent", "level": 3, "description": "Arquitectura técnica y sistemas distribuidos"},
+    "educational": {"name": "Educational Agent", "level": 3, "description": "Pedagogía y diseño instruccional"},
+    "marketing": {"name": "Marketing Agent", "level": 3, "description": "Estrategia de marketing y branding"},
+    "qa": {"name": "QA Agent", "level": 4, "description": "Testing y aseguramiento de calidad"},
+    "documentation": {"name": "Documentation Agent", "level": 4, "description": "Documentación técnica y knowledge management"},
+    "optimization": {"name": "Optimization Agent", "level": 4, "description": "Performance y optimización de procesos"},
+    "security": {"name": "Security Agent", "level": 4, "description": "Seguridad de la información y threat analysis"},
+    "integration": {"name": "Integration Agent", "level": 4, "description": "Integraciones y arquitectura de APIs"},
+    "review": {"name": "Review Agent", "level": 4, "description": "Revisión experta y feedback constructivo"},
+    "translation": {"name": "Translation Agent", "level": 5, "description": "Traducción profesional y localización"},
+    "summary": {"name": "Summary Agent", "level": 5, "description": "Síntesis y resumen de información"},
+    "formatting": {"name": "Formatting Agent", "level": 5, "description": "Formato profesional y presentación visual"},
+    "validation": {"name": "Validation Agent", "level": 5, "description": "Validación de datos y verificación"},
+    "coordination": {"name": "Coordination Agent", "level": 5, "description": "Coordinación de tareas y gestión de flujos"},
+    "explanation": {"name": "Explanation Agent", "level": 5, "description": "Explicaciones claras y comprensibles"},
+}
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifecycle manager for the app"""
-    print("🚀 Agentic Task Platform v2.0.1 iniciando...")
+    print("🚀 Agentic Task Platform v0.6.6 iniciando...")
     print(f"📡 Modelos disponibles: {list(MODELS.keys())}")
-    print(f"🤖 Agentes disponibles: {len(AGENT_DEFINITIONS)}")
-    
-    # Inicializar Agentic RAG si está disponible
-    if AGENTIC_RAG_AVAILABLE:
-        print("🧠 Inicializando sistema Agentic RAG...")
-        central_agent = get_central_agent("./data")
-        await central_agent.initialize()
-        print("✅ Agentic RAG inicializado correctamente")
+    print(f"🤖 30 Agentes Especializados con LangGraph y Protocolo A2A")
+    print(f"🧠 Sistema de Orquestación con StateGraph")
+    print(f"🎨 UI/UX Profesional - Grid 2 columnas, Estados mejorados")
     
     yield
     print("👋 Agentic Task Platform cerrando...")
@@ -48,8 +80,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Agentic Task Platform",
-    description="Sistema de 30 Agentes de IA con Agentic RAG y capacidad extrema de razonamiento",
-    version="2.0.1",
+    description="Sistema de Agentes Especializados con LangGraph y Protocolo A2A - Professional UI/UX",
+    version="0.6.6",
     lifespan=lifespan,
 )
 
@@ -68,7 +100,7 @@ async def health_check():
     """Health check endpoint"""
     return HealthResponse(
         status="healthy",
-        version="2.0.1",
+        version="0.6.6",
         models_available=list(MODELS.keys()),
         agents_count=len(AGENT_DEFINITIONS),
     )
@@ -76,31 +108,30 @@ async def health_check():
 
 @app.get("/api/agents")
 async def get_agents():
-    """Get all available agents"""
+    """Get all 30 specialized agents"""
     agents = []
-    for name, info in AGENT_DEFINITIONS.items():
+    for agent_id, info in AGENT_DEFINITIONS.items():
         agents.append({
-            "name": name,
-            "role": info["role"],
+            "id": agent_id,
+            "name": info["name"],
             "level": info["level"],
-            "goal": info["goal"],
+            "description": info["description"],
         })
     return {"agents": agents, "total": len(agents)}
 
 
-@app.get("/api/agents/{agent_name}")
-async def get_agent(agent_name: str):
+@app.get("/api/agents/{agent_id}")
+async def get_agent(agent_id: str):
     """Get a specific agent's information"""
-    if agent_name not in AGENT_DEFINITIONS:
-        raise HTTPException(status_code=404, detail=f"Agent {agent_name} not found")
+    if agent_id not in AGENT_DEFINITIONS:
+        raise HTTPException(status_code=404, detail=f"Agent {agent_id} not found")
     
-    info = AGENT_DEFINITIONS[agent_name]
+    info = AGENT_DEFINITIONS[agent_id]
     return {
-        "name": agent_name,
-        "role": info["role"],
+        "id": agent_id,
+        "name": info["name"],
         "level": info["level"],
-        "goal": info["goal"],
-        "backstory": info["backstory"],
+        "description": info["description"],
     }
 
 
@@ -158,7 +189,7 @@ async def fetch_models(request: FetchModelsRequest):
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     """
-    Main chat endpoint - processes user messages with selected agents
+    Main chat endpoint - processes user messages with selected agents using LangGraph Orchestrator
     """
     try:
         # Validate request
@@ -176,30 +207,59 @@ async def chat(request: ChatRequest):
                 detail=f"Invalid agents: {invalid_agents}"
             )
         
-        # Create agent service with selected model and API config
-        api_config = None
-        if request.apiConfig:
-            api_config = {
-                "type": request.apiConfig.type,
-                "api_key": request.apiConfig.apiKey,
-                "base_url": request.apiConfig.baseUrl,
-            }
+        # Create orchestrator with selected agents
+        orchestrator = AgentOrchestrator()
         
-        service = AgentService(model_id=request.model, api_config=api_config)
+        # Map agent IDs to agent instances with model configuration
+        agent_map = {
+            "reasoning": ReasoningAgent(model=request.model, api_config=request.apiConfig),
+            "planning": PlanningAgent(model=request.model, api_config=request.apiConfig),
+            "research": ResearchAgent(model=request.model, api_config=request.apiConfig),
+            "analysis": AnalysisAgent(model=request.model, api_config=request.apiConfig),
+            "synthesis": SynthesisAgent(model=request.model, api_config=request.apiConfig),
+            "critical_thinking": CriticalThinkingAgent(model=request.model, api_config=request.apiConfig),
+            "coding": CodingAgent(model=request.model, api_config=request.apiConfig),
+            "data": DataAgent(model=request.model, api_config=request.apiConfig),
+            "writing": WritingAgent(model=request.model, api_config=request.apiConfig),
+            "communication": CommunicationAgent(model=request.model, api_config=request.apiConfig),
+            "decision": DecisionAgent(model=request.model, api_config=request.apiConfig),
+            "problem_solving": ProblemSolvingAgent(model=request.model, api_config=request.apiConfig),
+            "legal": LegalAgent(model=request.model, api_config=request.apiConfig),
+            "financial": FinancialAgent(model=request.model, api_config=request.apiConfig),
+            "creative": CreativeAgent(model=request.model, api_config=request.apiConfig),
+            "technical": TechnicalAgent(model=request.model, api_config=request.apiConfig),
+            "educational": EducationalAgent(model=request.model, api_config=request.apiConfig),
+            "marketing": MarketingAgent(model=request.model, api_config=request.apiConfig),
+            "qa": QAAgent(model=request.model, api_config=request.apiConfig),
+            "documentation": DocumentationAgent(model=request.model, api_config=request.apiConfig),
+            "optimization": OptimizationAgent(model=request.model, api_config=request.apiConfig),
+            "security": SecurityAgent(model=request.model, api_config=request.apiConfig),
+            "integration": IntegrationAgent(model=request.model, api_config=request.apiConfig),
+            "review": ReviewAgent(model=request.model, api_config=request.apiConfig),
+            "translation": TranslationAgent(model=request.model, api_config=request.apiConfig),
+            "summary": SummaryAgent(model=request.model, api_config=request.apiConfig),
+            "formatting": FormattingAgent(model=request.model, api_config=request.apiConfig),
+            "validation": ValidationAgent(model=request.model, api_config=request.apiConfig),
+            "coordination": CoordinationAgent(model=request.model, api_config=request.apiConfig),
+            "explanation": ExplanationAgent(model=request.model, api_config=request.apiConfig),
+        }
         
-        # Execute task
-        result = service.execute_task(
-            message=request.message,
-            agent_names=request.agents,
-            context=request.context,
+        # Get selected agent instances
+        selected_agents = [agent_map[agent_id] for agent_id in request.agents if agent_id in agent_map]
+        
+        # Execute task with orchestrator
+        result = await orchestrator.execute(
+            task=request.message,
+            agents=selected_agents,
+            context=request.context or {}
         )
         
         return ChatResponse(
-            success=result["success"],
-            result=result["result"],
-            agents_used=result["agents_used"],
+            success=True,
+            result=result.get("final_result", ""),
+            agents_used=request.agents,
             model_used=request.model,
-            error=None if result["success"] else result.get("error"),
+            error=None,
         )
         
     except HTTPException:
@@ -215,169 +275,41 @@ async def chat(request: ChatRequest):
 
 
 @app.post("/api/quick-chat")
-async def quick_chat(message: str, model: str = "deepseek"):
+async def quick_chat(message: str, model: str = "gpt-4"):
     """
     Quick chat endpoint - uses default agents for simple queries
     """
-    default_agents = ["reasoning_agent", "synthesis_agent"]
+    default_agents = ["reasoning", "synthesis"]
     
-    service = AgentService(model_id=model)
-    result = service.execute_task(
-        message=message,
-        agent_names=default_agents,
+    orchestrator = AgentOrchestrator()
+    
+    agent_map = {
+        "reasoning": ReasoningAgent(),
+        "synthesis": SynthesisAgent(),
+    }
+    
+    selected_agents = [agent_map[agent_id] for agent_id in default_agents]
+    
+    result = await orchestrator.execute(
+        task=message,
+        agents=selected_agents,
+        context={}
     )
     
     return {
-        "success": result["success"],
-        "result": result["result"],
+        "success": True,
+        "result": result.get("final_result", ""),
         "model": model,
     }
 
 
-# ============== ENDPOINTS AGENTIC RAG ==============
-
-class AgenticRAGRequest(BaseModel):
-    """Request para el sistema Agentic RAG"""
-    query: str
-    agents: Optional[List[str]] = None
-    use_memory: bool = True
-    use_planning: bool = True
-    model_id: Optional[str] = None
-    api_config: Optional[Dict[str, Any]] = None
-
-
-class AgenticRAGResponse(BaseModel):
-    """Response del sistema Agentic RAG"""
-    success: bool
-    query: str
-    response: str
-    agents_used: List[str]
-    sources_consulted: List[str]
-    reasoning_trace: List[str]
-    plan_id: Optional[str] = None
-    error: Optional[str] = None
-
-
-@app.post("/api/agentic-rag", response_model=AgenticRAGResponse)
-async def agentic_rag_chat(request: AgenticRAGRequest):
-    """
-    Endpoint principal del sistema Agentic RAG
-    Procesa consultas usando el flujo completo:
-    1. Memoria (corto y largo plazo)
-    2. Planificación (ReACT + CoT)
-    3. Delegación a sub-agentes
-    4. MCP Servers (datos locales, búsqueda, cloud)
-    5. Síntesis final
-    """
-    if not AGENTIC_RAG_AVAILABLE:
-        return AgenticRAGResponse(
-            success=False,
-            query=request.query,
-            response="",
-            agents_used=[],
-            sources_consulted=[],
-            reasoning_trace=["Agentic RAG no disponible"],
-            error="Sistema Agentic RAG no inicializado"
-        )
-    
-    try:
-        central_agent = get_central_agent()
-        
-        # Configurar modelo si se especifica
-        if request.model_id:
-            central_agent.set_model(request.model_id)
-        
-        # Procesar consulta
-        result = await central_agent.process_query(
-            query=request.query,
-            selected_agents=request.agents
-        )
-        
-        return AgenticRAGResponse(
-            success=True,
-            query=result.query,
-            response=result.response,
-            agents_used=result.agents_used,
-            sources_consulted=result.sources_consulted,
-            reasoning_trace=result.reasoning_trace,
-            plan_id=result.plan_id
-        )
-        
-    except Exception as e:
-        return AgenticRAGResponse(
-            success=False,
-            query=request.query,
-            response="",
-            agents_used=[],
-            sources_consulted=[],
-            reasoning_trace=[f"Error: {str(e)}"],
-            error=str(e)
-        )
-
-
-@app.get("/api/agentic-rag/status")
-async def agentic_rag_status():
-    """Obtener estado del sistema Agentic RAG"""
-    if not AGENTIC_RAG_AVAILABLE:
-        return {"available": False, "error": "Agentic RAG no disponible"}
-    
-    central_agent = get_central_agent()
-    return {
-        "available": True,
-        "status": central_agent.get_system_status()
-    }
-
-
-@app.get("/api/agentic-rag/agents")
-async def agentic_rag_agents():
-    """Obtener agentes disponibles en Agentic RAG"""
-    if not AGENTIC_RAG_AVAILABLE:
-        return {"available": False, "agents": []}
-    
-    central_agent = get_central_agent()
-    return {
-        "available": True,
-        "agents": central_agent.get_available_agents()
-    }
-
-
-@app.post("/api/agentic-rag/memory/store")
-async def store_memory(fact: str, category: str = "general"):
-    """Almacenar conocimiento en memoria a largo plazo"""
-    if not AGENTIC_RAG_AVAILABLE:
-        return {"success": False, "error": "Agentic RAG no disponible"}
-    
-    central_agent = get_central_agent()
-    entry = central_agent.store_knowledge(fact, category)
-    return {
-        "success": True,
-        "entry_id": entry.id,
-        "message": "Conocimiento almacenado correctamente"
-    }
-
-
-@app.post("/api/agentic-rag/session/clear")
-async def clear_session():
-    """Limpiar sesión actual (memoria a corto plazo)"""
-    if not AGENTIC_RAG_AVAILABLE:
-        return {"success": False, "error": "Agentic RAG no disponible"}
-    
-    central_agent = get_central_agent()
-    central_agent.clear_session()
-    return {"success": True, "message": "Sesión limpiada correctamente"}
-
-
-@app.get("/api/agentic-rag/history")
-async def get_history(limit: int = 20):
-    """Obtener historial de consultas"""
-    if not AGENTIC_RAG_AVAILABLE:
-        return {"available": False, "history": []}
-    
-    central_agent = get_central_agent()
-    return {
-        "available": True,
-        "history": central_agent.get_query_history(limit)
-    }
+# ============== SISTEMA COMPLETO ==============
+# El sistema ATP v0.6.1 usa 30 agentes especializados con LangGraph
+# Los endpoints principales son:
+# - /api/chat: Chat con agentes seleccionados
+# - /api/quick-chat: Chat rápido con agentes por defecto
+# - /api/agents: Listar todos los agentes
+# - /api/models: Listar modelos disponibles
 
 
 if __name__ == "__main__":

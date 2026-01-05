@@ -104,6 +104,7 @@ interface ApiSettingsProps {
 
 export function ApiSettings({ isOpen, onClose, onProvidersChange }: ApiSettingsProps) {
   const [providers, setProviders] = useState<ApiProvider[]>([]);
+  const [originalProviders, setOriginalProviders] = useState<ApiProvider[]>([]);
   const [showKeys, setShowKeys] = useState<Record<string, boolean>>({});
   const [expandedProvider, setExpandedProvider] = useState<string | null>(null);
   const [customProvider, setCustomProvider] = useState({
@@ -116,6 +117,7 @@ export function ApiSettings({ isOpen, onClose, onProvidersChange }: ApiSettingsP
   const [loadingModels, setLoadingModels] = useState<string | null>(null);
   const [modelError, setModelError] = useState<string | null>(null);
   const [saveToStorage, setSaveToStorage] = useState(true);
+  const [hasChanges, setHasChanges] = useState(false);
 
   // Load providers from localStorage on mount
   useEffect(() => {
@@ -129,6 +131,7 @@ export function ApiSettings({ isOpen, onClose, onProvidersChange }: ApiSettingsP
       try {
         const parsed = JSON.parse(saved);
         setProviders(parsed);
+        setOriginalProviders(parsed);
         onProvidersChange(parsed);
       } catch (e) {
         console.error("Error loading providers:", e);
@@ -138,10 +141,19 @@ export function ApiSettings({ isOpen, onClose, onProvidersChange }: ApiSettingsP
 
   const saveProviders = (newProviders: ApiProvider[]) => {
     setProviders(newProviders);
+    // Detectar cambios
+    const changes = JSON.stringify(newProviders) !== JSON.stringify(originalProviders);
+    setHasChanges(changes);
+  };
+
+  const applyChanges = () => {
     if (saveToStorage) {
-      localStorage.setItem("atp-api-providers", JSON.stringify(newProviders));
+      localStorage.setItem("atp-api-providers", JSON.stringify(providers));
     }
-    onProvidersChange(newProviders);
+    setOriginalProviders(providers);
+    onProvidersChange(providers);
+    setHasChanges(false);
+    onClose();
   };
 
   const toggleSaveToStorage = () => {
@@ -160,8 +172,7 @@ export function ApiSettings({ isOpen, onClose, onProvidersChange }: ApiSettingsP
 
   const clearAllApis = () => {
     setProviders([]);
-    localStorage.removeItem("atp-api-providers");
-    onProvidersChange([]);
+    setHasChanges(true);
   };
 
   const handleAddProvider = (defaultProvider: typeof DEFAULT_PROVIDERS[0]) => {
@@ -633,15 +644,37 @@ export function ApiSettings({ isOpen, onClose, onProvidersChange }: ApiSettingsP
 
         {/* Footer */}
         <div className="flex items-center justify-between p-4 border-t border-border bg-muted/30">
-          <p className="text-xs text-muted-foreground">
-            {providers.filter(p => p.isActive && p.apiKey).length} proveedor(es) activo(s)
-          </p>
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            Listo
-          </button>
+          <div className="flex items-center gap-4">
+            <p className="text-xs text-muted-foreground">
+              {providers.filter(p => p.isActive && p.apiKey).length} proveedor(es) activo(s)
+            </p>
+            {hasChanges && (
+              <div className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
+                <AlertCircle className="h-3 w-3" />
+                <span>Tienes cambios sin guardar</span>
+              </div>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                setProviders(originalProviders);
+                setHasChanges(false);
+              }}
+              disabled={!hasChanges}
+              className="px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={applyChanges}
+              disabled={!hasChanges}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Save className="h-4 w-4" />
+              {hasChanges ? "Guardar Cambios" : "Listo"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

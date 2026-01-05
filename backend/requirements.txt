@@ -1,9 +1,18 @@
-# ATP Backend v1.0.1 - Sistema simplificado
+# ATP Backend v0.6.1 - Sistema de Agentes Especializados con LangGraph
 fastapi==0.115.5
 uvicorn[standard]==0.32.1
 pydantic==2.9.2
 python-dotenv==1.0.1
 httpx==0.28.1
 
-# OpenAI SDK - Core (versión compatible)
+# LangGraph y LangChain Core
+langgraph>=0.2.0
+langchain-core>=0.3.0
+langchain-openai>=0.2.0
+
+# OpenAI SDK
 openai>=2.9.0
+
+# Utilidades adicionales
+aiofiles>=24.1.0
+python-multipart>=0.0.9

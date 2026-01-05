@@ -55,7 +55,7 @@ export function Header({ model, onModelChange, isConnected, availableModels = []
           </h1>
           <div className="flex items-center gap-2 mt-0.5">
             <Badge variant="outline" className="text-xs font-mono">
-              v2.0.1
+              v0.6.6
             </Badge>
             <div className="flex items-center gap-1">
               <Wifi
@@ -77,9 +77,9 @@ export function Header({ model, onModelChange, isConnected, availableModels = []
         <div className="flex items-center gap-2">
           <Cpu className="h-4 w-4 text-muted-foreground" />
           <span className="text-xs text-muted-foreground hidden md:inline">Orquestador:</span>
-          <Select value={model} onValueChange={onModelChange}>
+          <Select value={model || ""} onValueChange={onModelChange}>
             <SelectTrigger className="w-[180px] md:w-[280px] bg-background/50 border-primary/30">
-              <SelectValue placeholder="Seleccionar modelo orquestador" />
+              <SelectValue placeholder="⚠️ Configura API primero" />
             </SelectTrigger>
             <SelectContent>
               {availableModels.length > 0 ? (

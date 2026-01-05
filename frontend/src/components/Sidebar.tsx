@@ -39,6 +39,7 @@ interface SidebarProps {
   onAgentModelChange?: (agentName: string, modelId: string) => void;
   agentInstructions?: Record<string, string>;
   onAgentInstructionsChange?: (agentName: string, instructions: string) => void;
+  onShowAgentDetails?: (agentName: string) => void;
 }
 
 const levelNames: Record<number, string> = {
@@ -68,6 +69,7 @@ export function Sidebar({
   onAgentModelChange,
   agentInstructions = {},
   onAgentInstructionsChange,
+  onShowAgentDetails,
 }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeLevel, setActiveLevel] = useState("all");
@@ -107,44 +109,49 @@ export function Sidebar({
   }
 
   return (
-    <div className="w-80 h-full bg-card/50 backdrop-blur-sm border-r border-primary/20 flex flex-col">
-      {/* Header */}
-      <div className="p-4 border-b border-primary/20">
+    <div className="w-[340px] h-full bg-gradient-to-b from-card/80 to-card/50 backdrop-blur-md border-r-2 border-primary/30 flex flex-col shadow-2xl overflow-hidden">
+      {/* Header - Mejorado */}
+      <div className="p-4 border-b-2 border-primary/30 bg-gradient-to-r from-primary/10 to-transparent">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Layers className="h-5 w-5 text-primary" />
-            <span className="font-semibold text-primary glow-text-subtle">
-              Agentes
-            </span>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-primary/20 border border-primary/40 shadow-lg">
+              <Layers className="h-6 w-6 text-primary animate-pulse" />
+            </div>
+            <div>
+              <span className="font-bold text-lg text-primary block leading-none">
+                Agentes
+              </span>
+            </div>
           </div>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setIsCollapsed(true)}
-            className="text-muted-foreground hover:text-primary"
+            className="text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
         </div>
 
-        <div className="flex items-center justify-between">
-          <Badge variant="success" className="font-mono">
-            {selectedAgents.length} / {agents.length} activos
+        <div className="flex items-center justify-between gap-2">
+          <Badge variant="success" className="font-mono text-sm px-3 py-1.5 shadow-md">
+            ✓ {selectedAgents.length} / {agents.length} activos
           </Badge>
-          <div className="flex gap-1">
+          <div className="flex gap-2">
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
               onClick={() => onSelectAll()}
-              className="text-xs"
+              className="text-xs font-semibold border-primary/40 hover:bg-primary/20 hover:border-primary transition-all"
             >
+              <Zap className="h-3 w-3 mr-1" />
               Todos
             </Button>
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
               onClick={onClearAll}
-              className="text-xs"
+              className="text-xs font-semibold border-destructive/40 hover:bg-destructive/20 hover:border-destructive transition-all"
             >
               Limpiar
             </Button>
@@ -152,45 +159,51 @@ export function Sidebar({
         </div>
       </div>
 
-      {/* Level Tabs */}
-      <Tabs value={activeLevel} onValueChange={setActiveLevel} className="flex-1 flex flex-col">
-        <TabsList className="mx-4 mt-4 grid grid-cols-6">
-          <TabsTrigger value="all" className="text-xs">
-            All
+      {/* Level Tabs - Mejorado */}
+      <Tabs value={activeLevel} onValueChange={setActiveLevel} className="flex-1 flex flex-col overflow-hidden min-h-0">
+        <TabsList className="mx-4 mt-4 grid grid-cols-6 bg-muted/40 p-1 rounded-xl border border-primary/20">
+          <TabsTrigger value="all" className="text-xs font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all">
+            Todos
           </TabsTrigger>
           {[1, 2, 3, 4, 5].map((level) => (
-            <TabsTrigger key={level} value={level.toString()} className="text-xs">
+            <TabsTrigger 
+              key={level} 
+              value={level.toString()} 
+              className="text-xs font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all"
+            >
               L{level}
             </TabsTrigger>
           ))}
         </TabsList>
 
-        <TabsContent value={activeLevel} className="flex-1 mt-0">
-          <ScrollArea className="h-full px-4 py-4">
+        <TabsContent value={activeLevel} className="flex-1 mt-0 overflow-hidden min-h-0">
+          <div className="flex-1 h-full min-h-0 px-3 py-4">
+            <ScrollArea className="h-full w-full flex-1 min-h-0 pr-1">
             {activeLevel === "all" ? (
               <div className="space-y-6">
                 {Object.entries(agentsByLevel).map(([level, levelAgents]) => (
                   <div key={level}>
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between mb-3 p-2 rounded-lg bg-gradient-to-r from-primary/10 to-transparent border-l-4 border-primary">
                       <div>
-                        <h3 className="text-sm font-semibold text-primary">
+                        <h3 className="text-sm font-bold text-primary flex items-center gap-2">
+                          <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse"></span>
                           Nivel {level} - {levelNames[parseInt(level)]}
                         </h3>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs text-muted-foreground mt-0.5">
                           {levelDescriptions[parseInt(level)]}
                         </p>
                       </div>
                       <Button
-                        variant="ghost"
+                        variant="outline"
                         size="sm"
                         onClick={() => onSelectAll(parseInt(level))}
-                        className="text-xs h-6"
+                        className="text-xs h-7 font-semibold border-primary/40 hover:bg-primary/20 hover:border-primary transition-all"
                       >
                         <Zap className="h-3 w-3 mr-1" />
                         Todos
                       </Button>
                     </div>
-                    <div className="grid gap-2">
+                    <div className="flex flex-col gap-3">
                       {levelAgents.map((agent) => (
                         <AgentCard
                           key={agent.name}
@@ -204,6 +217,7 @@ export function Sidebar({
                           onModelChange={onAgentModelChange}
                           customInstructions={agentInstructions[agent.name]}
                           onInstructionsChange={onAgentInstructionsChange}
+                          onShowDetails={onShowAgentDetails}
                         />
                       ))}
                     </div>
@@ -211,7 +225,7 @@ export function Sidebar({
                 ))}
               </div>
             ) : (
-              <div className="grid gap-2">
+              <div className="flex flex-col gap-3">
                 {filteredAgents.map((agent) => (
                   <AgentCard
                     key={agent.name}
@@ -225,11 +239,13 @@ export function Sidebar({
                     onModelChange={onAgentModelChange}
                     customInstructions={agentInstructions[agent.name]}
                     onInstructionsChange={onAgentInstructionsChange}
+                    onShowDetails={onShowAgentDetails}
                   />
                 ))}
               </div>
             )}
-          </ScrollArea>
+            </ScrollArea>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

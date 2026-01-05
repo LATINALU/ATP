@@ -12,60 +12,79 @@ import { Settings, Plus, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { Agent, Message } from "@/types";
+import { AgentDetailPanel } from "@/components/AgentDetailPanel";
 
 const AGENTS_DATA: Agent[] = [
-  // Level 1 - Critical
-  { name: "reasoning_agent", role: "Maestro de Razonamiento Lógico y Pensamiento Crítico", level: 1 },
-  { name: "planning_agent", role: "Estratega de Planificación y Gestión de Proyectos", level: 1 },
-  { name: "research_agent", role: "Investigador Senior y Analista de Información", level: 1 },
-  { name: "analysis_agent", role: "Analista Experto en Descomposición de Problemas", level: 1 },
-  { name: "synthesis_agent", role: "Integrador de Conocimiento y Generador de Insights", level: 1 },
-  { name: "critical_thinking_agent", role: "Evaluador Crítico y Detector de Falacias", level: 1 },
-  // Level 2 - Essential
-  { name: "coding_agent", role: "Ingeniero de Software Senior y Arquitecto de Código", level: 2 },
-  { name: "writing_agent", role: "Escritor Profesional y Comunicador Experto", level: 2 },
-  { name: "data_agent", role: "Científico de Datos y Analista Cuantitativo", level: 2 },
-  { name: "communication_agent", role: "Especialista en Comunicación y Relaciones", level: 2 },
-  { name: "decision_agent", role: "Estratega de Decisiones y Análisis de Opciones", level: 2 },
-  { name: "problem_solving_agent", role: "Solucionador Creativo de Problemas", level: 2 },
-  // Level 3 - Specialized
-  { name: "legal_agent", role: "Asesor Legal y Especialista en Cumplimiento", level: 3 },
-  { name: "financial_agent", role: "Analista Financiero y Estratega Económico", level: 3 },
-  { name: "creative_agent", role: "Director Creativo y Generador de Ideas", level: 3 },
-  { name: "technical_agent", role: "Arquitecto Técnico y Especialista en Sistemas", level: 3 },
-  { name: "educational_agent", role: "Educador Experto y Diseñador Instruccional", level: 3 },
-  { name: "marketing_agent", role: "Estratega de Marketing y Especialista en Branding", level: 3 },
-  // Level 4 - Support
-  { name: "qa_agent", role: "Ingeniero de Calidad y Testing", level: 4 },
-  { name: "documentation_agent", role: "Especialista en Documentación Técnica", level: 4 },
-  { name: "optimization_agent", role: "Ingeniero de Optimización y Performance", level: 4 },
-  { name: "security_agent", role: "Especialista en Seguridad de la Información", level: 4 },
-  { name: "integration_agent", role: "Arquitecto de Integraciones y APIs", level: 4 },
-  { name: "review_agent", role: "Revisor Experto y Coach de Mejora", level: 4 },
-  // Level 5 - Auxiliary
-  { name: "translation_agent", role: "Traductor Profesional y Especialista en Localización", level: 5 },
-  { name: "summary_agent", role: "Especialista en Síntesis y Resumen", level: 5 },
-  { name: "formatting_agent", role: "Especialista en Formato y Presentación Visual", level: 5 },
-  { name: "validation_agent", role: "Verificador de Exactitud y Consistencia", level: 5 },
-  { name: "coordination_agent", role: "Coordinador de Equipos y Flujos de Trabajo", level: 5 },
-  { name: "explanation_agent", role: "Explicador Experto y Clarificador", level: 5 },
+  // Level 1 - Critical (6 agentes)
+  { name: "reasoning", role: "Maestro de Razonamiento Lógico y Pensamiento Crítico", level: 1 },
+  { name: "planning", role: "Estratega de Planificación y Gestión de Proyectos", level: 1 },
+  { name: "research", role: "Investigador Senior y Analista de Información", level: 1 },
+  { name: "analysis", role: "Analista Experto en Descomposición de Problemas", level: 1 },
+  { name: "synthesis", role: "Integrador de Conocimiento y Generador de Insights", level: 1 },
+  { name: "critical_thinking", role: "Evaluador Crítico y Detector de Falacias", level: 1 },
+  // Level 2 - Essential (6 agentes)
+  { name: "coding", role: "Ingeniero de Software Senior y Arquitecto de Código", level: 2 },
+  { name: "data", role: "Científico de Datos y Analista Cuantitativo", level: 2 },
+  { name: "writing", role: "Escritor Profesional y Comunicador Experto", level: 2 },
+  { name: "communication", role: "Especialista en Comunicación y Relaciones", level: 2 },
+  { name: "decision", role: "Estratega de Decisiones y Análisis de Opciones", level: 2 },
+  { name: "problem_solving", role: "Solucionador Creativo de Problemas", level: 2 },
+  // Level 3 - Specialized (6 agentes)
+  { name: "legal", role: "Asesor Legal y Especialista en Cumplimiento", level: 3 },
+  { name: "financial", role: "Analista Financiero y Estratega Económico", level: 3 },
+  { name: "creative", role: "Director Creativo y Generador de Ideas", level: 3 },
+  { name: "technical", role: "Arquitecto Técnico y Especialista en Sistemas", level: 3 },
+  { name: "educational", role: "Educador Experto y Diseñador Instruccional", level: 3 },
+  { name: "marketing", role: "Estratega de Marketing y Especialista en Branding", level: 3 },
+  // Level 4 - Support (6 agentes)
+  { name: "qa", role: "Ingeniero de Calidad y Testing", level: 4 },
+  { name: "documentation", role: "Especialista en Documentación Técnica", level: 4 },
+  { name: "optimization", role: "Ingeniero de Optimización y Performance", level: 4 },
+  { name: "security", role: "Especialista en Seguridad de la Información", level: 4 },
+  { name: "integration", role: "Arquitecto de Integraciones y APIs", level: 4 },
+  { name: "review", role: "Revisor Experto y Coach de Mejora", level: 4 },
+  // Level 5 - Auxiliary (6 agentes)
+  { name: "translation", role: "Traductor Profesional y Especialista en Localización", level: 5 },
+  { name: "summary", role: "Especialista en Síntesis y Resumen", level: 5 },
+  { name: "formatting", role: "Especialista en Formato y Presentación Visual", level: 5 },
+  { name: "validation", role: "Verificador de Exactitud y Consistencia", level: 5 },
+  { name: "coordination", role: "Coordinador de Equipos y Flujos de Trabajo", level: 5 },
+  { name: "explanation", role: "Explicador Experto y Clarificador", level: 5 },
 ];
+
+const DEFAULT_MODEL = "openai/gpt-oss-120b";
+const GROQ_FALLBACK_MODELS = [
+  { id: "openai/gpt-oss-120b", name: "openai/gpt-oss-120b", provider: "Groq" },
+  { id: "llama-3.3-70b-versatile", name: "llama-3.3-70b-versatile", provider: "Groq" },
+  { id: "mixtral-8x7b-32768", name: "mixtral-8x7b-32768", provider: "Groq" },
+];
+
+interface AgentProgress {
+  agent_id: string;
+  agent_name: string;
+  status: "pending" | "processing" | "completed" | "error";
+  progress?: number;
+  current_step?: string;
+  result?: string;
+}
 
 export default function Home() {
   const [selectedAgents, setSelectedAgents] = useState<string[]>([
-    "reasoning_agent",
-    "analysis_agent",
-    "synthesis_agent",
+    "reasoning",
+    "analysis",
+    "synthesis",
   ]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
-  const [model, setModel] = useState("deepseek");
+  const [model, setModel] = useState(DEFAULT_MODEL);
   const [showApiSettings, setShowApiSettings] = useState(false);
   const [apiProviders, setApiProviders] = useState<ApiProvider[]>([]);
   const [availableModels, setAvailableModels] = useState<{id: string; name: string; provider: string}[]>([]);
   const [agentModels, setAgentModels] = useState<Record<string, string>>({});
   const [agentInstructions, setAgentInstructions] = useState<Record<string, string>>({});
+  const [currentAgentProgress, setCurrentAgentProgress] = useState<AgentProgress[]>([]);
+  const [activeAgentDetail, setActiveAgentDetail] = useState<string | null>(null);
 
   useEffect(() => {
     // Check backend connection
@@ -90,21 +109,36 @@ export default function Home() {
         const providers = JSON.parse(saved);
         setApiProviders(providers);
         
-        // Get models from ALL active providers with API keys
+        // Get models from ALL active providers with API keys (SOLO enabledModels)
         const activeProviders = providers.filter((p: ApiProvider) => p.isActive && p.apiKey);
         if (activeProviders.length > 0) {
           const allModels = activeProviders.flatMap((p: ApiProvider) => 
-            p.models.map((m: string) => ({ 
+            (p.enabledModels || p.models).map((m: string) => ({ 
               id: m, 
               name: m,
               provider: p.name 
             }))
           );
           setAvailableModels(allModels);
+          
+          // Si el modelo actual no está en los disponibles, seleccionar el primero
+          if (allModels.length > 0 && !allModels.find((m: {id: string}) => m.id === model)) {
+            setModel(allModels[0].id);
+          }
+        } else {
+          // No hay providers activos con API keys
+          setAvailableModels(GROQ_FALLBACK_MODELS);
+          setModel(DEFAULT_MODEL);
         }
       } catch (e) {
         console.error("Error loading API providers:", e);
+        setAvailableModels(GROQ_FALLBACK_MODELS);
+        setModel(DEFAULT_MODEL);
       }
+    } else {
+      // No hay providers guardados
+      setAvailableModels(GROQ_FALLBACK_MODELS);
+      setModel(DEFAULT_MODEL);
     }
     
     // Load agent models config
@@ -168,13 +202,21 @@ export default function Home() {
     localStorage.setItem("atp-agent-instructions", JSON.stringify(newInstructions));
   };
 
+  const handleShowAgentDetails = (agentName: string) => {
+    setActiveAgentDetail(agentName);
+  };
+
+  const activeAgentMeta = activeAgentDetail
+    ? AGENTS_DATA.find((agent) => agent.name === activeAgentDetail)
+    : undefined;
+
   const handleProvidersChange = (providers: ApiProvider[]) => {
     setApiProviders(providers);
-    // Update available models from ALL active providers with API keys
+    // Update available models from ALL active providers with API keys (SOLO enabledModels)
     const activeProviders = providers.filter(p => p.isActive && p.apiKey);
     if (activeProviders.length > 0) {
       const allModels = activeProviders.flatMap(p => 
-        p.models.map(m => ({ 
+        (p.enabledModels || p.models).map(m => ({ 
           id: m, 
           name: m,
           provider: p.name 
@@ -183,16 +225,22 @@ export default function Home() {
       setAvailableModels(allModels);
       
       // Si el modelo actual no está disponible, seleccionar el primero
-      if (allModels.length > 0 && !allModels.find(m => m.id === model)) {
+      if (allModels.length > 0 && !allModels.find((m: {id: string}) => m.id === model)) {
         setModel(allModels[0].id);
       }
     } else {
-      setAvailableModels([]);
+      setAvailableModels(GROQ_FALLBACK_MODELS);
+      setModel(DEFAULT_MODEL); // Mantener modelo predeterminado Groq
     }
   };
 
   const handleSendMessage = async (content: string) => {
     if (!content.trim() || selectedAgents.length === 0) return;
+
+    const effectiveModel = model || DEFAULT_MODEL;
+    const activeGroqProvider = apiProviders.find(
+      (p) => p.isActive && p.apiKey && p.type === "groq"
+    );
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -203,8 +251,22 @@ export default function Home() {
 
     setMessages((prev) => [...prev, userMessage]);
     setIsProcessing(true);
+    
+    // Inicializar progreso de agentes
+    const initialProgress: AgentProgress[] = selectedAgents.map(agentId => ({
+      agent_id: agentId,
+      agent_name: AGENTS_DATA.find(a => a.name === agentId)?.role || agentId,
+      status: "pending",
+      progress: 0,
+      current_step: "Esperando..."
+    }));
+    setCurrentAgentProgress(initialProgress);
 
     try {
+      // Timeout de 5 minutos para procesamiento largo
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutos
+      
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
@@ -213,11 +275,17 @@ export default function Home() {
         body: JSON.stringify({
           message: content,
           agents: selectedAgents,
-          model,
-          // Send active API provider config
-          apiConfig: apiProviders.find(p => p.isActive && p.apiKey) || null,
+          model: effectiveModel,
+          // Only send API config if the user added one; otherwise backend uses server defaults
+          apiConfig: activeGroqProvider && activeGroqProvider.apiKey ? activeGroqProvider : undefined,
+          // Enviar configuraciones personalizadas de agentes
+          agentModels,
+          agentInstructions,
         }),
+        signal: controller.signal,
       });
+      
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error("Error en la respuesta del servidor");
@@ -228,7 +296,7 @@ export default function Home() {
       // Check if there's an error in the response
       let responseContent = "";
       if (data.error) {
-        responseContent = `⚠️ **Error:** ${data.error}\n\n💡 **Solución:** Configura tu API key en el botón de ⚙️ Configuración (esquina superior derecha).`;
+        responseContent = `⚠️ **Error del backend:** ${data.error}`;
       } else if (data.result && data.result.trim()) {
         responseContent = data.result;
       } else if (data.message) {
@@ -244,20 +312,53 @@ export default function Home() {
         timestamp: new Date(),
         agents: selectedAgents,
         status: data.success ? "completed" : "error",
+        a2a_messages_count: data.a2a_messages_count,
+        a2a_responses_count: data.a2a_responses_count,
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+      
+      // Actualizar progreso final de agentes
+      if (data.agents_used) {
+        const finalProgress: AgentProgress[] = data.agents_used.map((agentId: string) => ({
+          agent_id: agentId,
+          agent_name: AGENTS_DATA.find(a => a.name === agentId)?.role || agentId,
+          status: "completed" as const,
+          progress: 100,
+          current_step: "Completado"
+        }));
+        setCurrentAgentProgress(finalProgress);
+      }
     } catch (error) {
+      let errorContent = "Error desconocido";
+      
+      if (error instanceof Error) {
+        if (error.name === "AbortError") {
+          errorContent = "⚠️ **Timeout:** El procesamiento tomó más de 5 minutos. Los agentes pueden estar procesando tareas muy complejas. Intenta con una tarea más simple o menos agentes.";
+        } else {
+          errorContent = `Error: ${error.message}. Asegúrate de que el backend esté ejecutándose.`;
+        }
+      }
+      
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: `Error: ${error instanceof Error ? error.message : "Error desconocido"}. Asegúrate de que el backend esté ejecutándose.`,
+        content: errorContent,
         timestamp: new Date(),
         status: "error",
       };
       setMessages((prev) => [...prev, errorMessage]);
+      
+      // Marcar agentes como error
+      setCurrentAgentProgress(prev => prev.map(agent => ({
+        ...agent,
+        status: "error" as const,
+        current_step: "Error en procesamiento"
+      })));
     } finally {
       setIsProcessing(false);
+      // Limpiar progreso después de 3 segundos
+      setTimeout(() => setCurrentAgentProgress([]), 3000);
     }
   };
 
@@ -327,6 +428,7 @@ export default function Home() {
           onAgentModelChange={handleAgentModelChange}
           agentInstructions={agentInstructions}
           onAgentInstructionsChange={handleAgentInstructionsChange}
+          onShowAgentDetails={handleShowAgentDetails}
         />
 
         <main className="flex-1 p-4 overflow-hidden flex flex-col gap-4">
@@ -344,6 +446,8 @@ export default function Home() {
               onSendMessage={handleSendMessage}
               messages={messages}
               isProcessing={isProcessing}
+              currentAgentProgress={currentAgentProgress}
+              totalAgents={AGENTS_DATA.length}
             />
           </div>
         </main>
@@ -356,6 +460,20 @@ export default function Home() {
           onLoadMemory={handleLoadMemory}
         />
       </div>
+
+      {activeAgentDetail && activeAgentMeta && (
+        <AgentDetailPanel
+          agentName={activeAgentDetail}
+          role={activeAgentMeta.role}
+          level={activeAgentMeta.level}
+          selectedModel={agentModels[activeAgentDetail]}
+          availableModels={availableModels}
+          instructions={agentInstructions[activeAgentDetail]}
+          onModelChange={handleAgentModelChange}
+          onInstructionsChange={handleAgentInstructionsChange}
+          onClose={() => setActiveAgentDetail(null)}
+        />
+      )}
     </div>
   );
 }

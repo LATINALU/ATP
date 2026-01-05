@@ -5,7 +5,7 @@ Usa OpenAI SDK directamente - compatible con múltiples proveedores
 import os
 from openai import OpenAI
 from typing import Optional, Dict, Any, List
-from app.config import MODELS, DEEPSEEK_API_KEY, GROQ_API_KEY
+from app.config import MODELS, GROQ_API_KEY
 
 # Configuración de proveedores con sus endpoints y modelos por defecto
 PROVIDERS = {
@@ -57,11 +57,8 @@ def get_openai_client(api_config: Dict[str, Any] = None) -> tuple[OpenAI, str]:
         client = OpenAI(api_key=api_key, base_url=base_url)
         return client, model
     
-    # Fallback a variables de entorno
-    if DEEPSEEK_API_KEY:
-        client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url="https://api.deepseek.com/v1")
-        return client, "deepseek-chat"
-    elif GROQ_API_KEY:
+    # Fallback a variables de entorno (solo Groq)
+    if GROQ_API_KEY:
         client = OpenAI(api_key=GROQ_API_KEY, base_url="https://api.groq.com/openai/v1")
         return client, "llama-3.3-70b-versatile"
     else:
@@ -70,6 +67,7 @@ def get_openai_client(api_config: Dict[str, Any] = None) -> tuple[OpenAI, str]:
 
 def chat_completion(
     messages: List[Dict[str, str]], 
+    model: str = None,
     api_config: Dict[str, Any] = None,
     temperature: float = 0.7,
     max_tokens: int = 4096
@@ -77,10 +75,13 @@ def chat_completion(
     """
     Ejecuta una llamada de chat completion y retorna el contenido.
     """
-    client, model = get_openai_client(api_config)
+    client, default_model = get_openai_client(api_config)
+    
+    # Usar el modelo proporcionado o el default
+    actual_model = model or default_model
     
     response = client.chat.completions.create(
-        model=model,
+        model=actual_model,
         messages=messages,
         temperature=temperature,
         max_tokens=max_tokens,
