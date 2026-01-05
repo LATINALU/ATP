@@ -25,6 +25,7 @@ interface Agent {
 interface AvailableModel {
   id: string;
   name: string;
+  provider: string;
 }
 
 interface SidebarProps {

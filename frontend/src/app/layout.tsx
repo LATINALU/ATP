@@ -14,7 +14,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ATP - Agentes de Tareas Polivalentes",
+  title: "Agentic Task Platform",
   description: "Sistema de 30 Agentes de IA con capacidad extrema de razonamiento",
 };
 

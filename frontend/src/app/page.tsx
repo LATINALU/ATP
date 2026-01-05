@@ -63,7 +63,7 @@ export default function Home() {
   const [model, setModel] = useState("deepseek");
   const [showApiSettings, setShowApiSettings] = useState(false);
   const [apiProviders, setApiProviders] = useState<ApiProvider[]>([]);
-  const [availableModels, setAvailableModels] = useState<{id: string; name: string}[]>([]);
+  const [availableModels, setAvailableModels] = useState<{id: string; name: string; provider: string}[]>([]);
   const [agentModels, setAgentModels] = useState<Record<string, string>>({});
   const [agentInstructions, setAgentInstructions] = useState<Record<string, string>>({});
 
@@ -90,10 +90,17 @@ export default function Home() {
         const providers = JSON.parse(saved);
         setApiProviders(providers);
         
-        // Get models from active provider
-        const activeProvider = providers.find((p: ApiProvider) => p.isActive && p.apiKey);
-        if (activeProvider && activeProvider.models.length > 0) {
-          setAvailableModels(activeProvider.models.map((m: string) => ({ id: m, name: m })));
+        // Get models from ALL active providers with API keys
+        const activeProviders = providers.filter((p: ApiProvider) => p.isActive && p.apiKey);
+        if (activeProviders.length > 0) {
+          const allModels = activeProviders.flatMap((p: ApiProvider) => 
+            p.models.map((m: string) => ({ 
+              id: m, 
+              name: m,
+              provider: p.name 
+            }))
+          );
+          setAvailableModels(allModels);
         }
       } catch (e) {
         console.error("Error loading API providers:", e);
@@ -163,10 +170,22 @@ export default function Home() {
 
   const handleProvidersChange = (providers: ApiProvider[]) => {
     setApiProviders(providers);
-    // Update available models from active provider
-    const activeProvider = providers.find(p => p.isActive && p.apiKey);
-    if (activeProvider && activeProvider.models.length > 0) {
-      setAvailableModels(activeProvider.models.map(m => ({ id: m, name: m })));
+    // Update available models from ALL active providers with API keys
+    const activeProviders = providers.filter(p => p.isActive && p.apiKey);
+    if (activeProviders.length > 0) {
+      const allModels = activeProviders.flatMap(p => 
+        p.models.map(m => ({ 
+          id: m, 
+          name: m,
+          provider: p.name 
+        }))
+      );
+      setAvailableModels(allModels);
+      
+      // Si el modelo actual no está disponible, seleccionar el primero
+      if (allModels.length > 0 && !allModels.find(m => m.id === model)) {
+        setModel(allModels[0].id);
+      }
     } else {
       setAvailableModels([]);
     }

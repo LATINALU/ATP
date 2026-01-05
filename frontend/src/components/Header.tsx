@@ -22,7 +22,7 @@ import {
 interface AvailableModel {
   id: string;
   name: string;
-  provider?: string;
+  provider: string;
 }
 
 interface HeaderProps {
@@ -40,7 +40,7 @@ export function Header({ model, onModelChange, isConnected, availableModels = []
   }, []);
 
   return (
-    <header className="h-16 border-b border-primary/20 bg-card/50 backdrop-blur-sm px-4 flex items-center justify-between">
+    <header className="min-h-16 border-b border-primary/20 bg-card/50 backdrop-blur-sm px-4 py-2 flex flex-wrap items-center justify-between gap-4">
       {/* Logo */}
       <div className="flex items-center gap-3">
         <div className="relative">
@@ -50,11 +50,8 @@ export function Header({ model, onModelChange, isConnected, availableModels = []
           <div className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full bg-green-500 border-2 border-background animate-pulse" />
         </div>
         <div>
-          <h1 className="text-xl font-bold tracking-tight">
-            <span className="text-primary glow-text-subtle">ATP</span>
-            <span className="text-muted-foreground ml-2 text-sm font-normal">
-              Agentes de Tareas Polivalentes
-            </span>
+          <h1 className="text-lg md:text-xl font-bold tracking-tight">
+            <span className="text-primary glow-text-subtle">Agentic Task Platform</span>
           </h1>
           <div className="flex items-center gap-2 mt-0.5">
             <Badge variant="outline" className="text-xs font-mono">
@@ -76,12 +73,12 @@ export function Header({ model, onModelChange, isConnected, availableModels = []
       </div>
 
       {/* Center - Model Selector */}
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-2 md:gap-4">
         <div className="flex items-center gap-2">
           <Cpu className="h-4 w-4 text-muted-foreground" />
-          <span className="text-xs text-muted-foreground">Orquestador:</span>
+          <span className="text-xs text-muted-foreground hidden md:inline">Orquestador:</span>
           <Select value={model} onValueChange={onModelChange}>
-            <SelectTrigger className="w-[280px] bg-background/50 border-primary/30">
+            <SelectTrigger className="w-[180px] md:w-[280px] bg-background/50 border-primary/30">
               <SelectValue placeholder="Seleccionar modelo orquestador" />
             </SelectTrigger>
             <SelectContent>
