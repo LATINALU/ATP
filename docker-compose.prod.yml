@@ -7,15 +7,15 @@ services:
     restart: unless-stopped
     environment:
       - PYTHONUNBUFFERED=1
-      - PORT=8000
+      - PORT=8001
     ports:
-      - "8000:8000"
+      - "8001:8001"
     volumes:
       - ./backend:/app
     networks:
       - atp-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -28,9 +28,9 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=http://atp-app.duckdns.org:8000
+      - NEXT_PUBLIC_API_URL=http://atp-app.duckdns.org:8001
     ports:
-      - "3000:3000"
+      - "3001:3000"
     depends_on:
       - backend
     networks:
