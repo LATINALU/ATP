@@ -1,7 +1,7 @@
 # Agentic Task Platform (ATP)
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-0.7.0-orange.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-0.9.0-orange.svg" alt="Version">
   <img src="https://img.shields.io/badge/status-alpha-yellow.svg" alt="Status">
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
   <img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python">
@@ -10,8 +10,8 @@
 </p>
 
 ATP es una plataforma agentic diseñada para equipos que necesitan coordinar **30 agentes especializados** mediante un pipeline visual y un backend unificado basado en **LangGraph + A2A Protocol**.  
-La nueva versión alinea **Node Workflow Editor**, **Chat Interface** y **Agent Orchestrator** bajo un mismo flujo:  
-**User Query → LangGraph StateGraph → A2A Messages → Agents Cluster → A2A Responses → Synthesis → Final Result**.
+La versión **0.9.0** alinea completamente **Node Workflow Editor**, **Chat Interface** y **Agent Orchestrator** bajo el flujo auditado:  
+**User Query → LangGraph StateGraph → A2A Messages → Agents Cluster → A2A Responses → Synthesis → Final Result** (idéntico en backend y editor visual).
 
 ---
 
@@ -19,9 +19,9 @@ La nueva versión alinea **Node Workflow Editor**, **Chat Interface** y **Agent 
 
 | Área | Novedades |
 |------|-----------|
-| **Orquestación** | Backend FastAPI con LangGraph StateGraph, agentes aislados y protocolo A2A para mensajes estructurados. |
-| **Node Workflow Editor** | 7 nodos oficiales, handles color-coded y validaciones estrictas para recrear el pipeline real. |
-| **Chat Mode** | Conversación multiagente en tiempo real, uso opcional de API keys del usuario y fallback a modelos Groq configurados en el backend. |
+| **Orquestación** | Backend FastAPI con LangGraph StateGraph, agentes aislados y protocolo A2A para mensajes estructurados. El orquestador se registra como agente y cada ejecución queda trazada (`✅/❌`). |
+| **Node Workflow Editor** | 7 nodos oficiales, handles color-coded y validaciones estrictas para recrear el pipeline real. El backend del editor usa exactamente el mismo estado LangGraph/A2A documentado. |
+| **Chat Mode** | Conversación multiagente en tiempo real, uso opcional de API keys del usuario y fallback al modelo gratuito `llama-3.3-70b-versatile` de Groq configurado en backend. |
 | **Memoria Conversacional** | Guardado con tags automáticos, filtros (favoritos / últimas 24h) y estadísticas rápidas. |
 | **Docker Ready** | Un único `docker-compose.yml` levanta frontend (Next.js 14) y backend (FastAPI) con hot-reload. |
 | **Documentación** | Nuevos manuales (`PROJECT_OVERVIEW.md`, `LANGGRAPH_A2A_ARCHITECTURE.md`, etc.) enfocados en operaciones y despliegue. |
@@ -105,9 +105,9 @@ Cada agente cuenta con su propio módulo en `backend/app/agents/` y comparte una
 git clone https://github.com/LATINALU/ATP.git
 cd ATP
 
-# 2. Configurar variables (.env opcional si ya tienes la variable del host)
+# 2. Configurar variables (usa el template actualizado)
 copy .env.example .env  # Windows
-# edit .env y establece GROQ_API_KEY
+# edit .env y establece GROQ_API_KEY=tu_api_key_de_groq
 
 # 3. Levantar todo el stack
 docker-compose up -d --build

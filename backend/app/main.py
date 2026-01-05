@@ -265,6 +265,10 @@ async def chat(request: ChatRequest):
     except HTTPException:
         raise
     except Exception as e:
+        import traceback
+        error_traceback = traceback.format_exc()
+        print(f"❌ ERROR EN /api/chat: {str(e)}")
+        print(f"📋 TRACEBACK:\n{error_traceback}")
         return ChatResponse(
             success=False,
             result="",

@@ -1,4 +1,4 @@
-# LangGraph + A2A Protocol Architecture - ATP v0.6.8
+# LangGraph + A2A Protocol Architecture - ATP v0.9.0
 
 ## 🎯 Objetivo
 
@@ -7,6 +7,16 @@ Implementar una arquitectura limpia donde:
 - **A2A Protocol** maneja TODA la comunicación entre agentes (capa aislada)
 - Los agentes NUNCA se comunican directamente entre sí
 - Sin enredos: comunicación estructurada y validada
+
+---
+
+## 🆕 Cambios clave en v0.9.0
+
+- **Comunicación A2A corregida**: todos los agentes usan `AgentCapability` válidos (se añadió `COMMUNICATION` al enum) y la orquestación registra al propio `orchestrator` dentro del protocolo.
+- **LLM async real**: `chat_completion` y `test_connection` ahora son funciones `async`, evitando bloqueos y errores tipo `COMMUNICATION`.
+- **Node Workflow Editor alineado**: el backend del editor utiliza el mismo flujo `User Query → LangGraph StateGraph → A2A Messages → Agents → A2A Responses → Síntesis → Final Result`, garantizando paridad entre UI y ejecución real.
+- **Modelo por defecto documentado**: `llama-3.3-70b-versatile` (Groq) es el modelo gratuito configurado; cualquier otra clave se inyecta vía `.env`.
+- **Logging y trazabilidad**: se añadieron logs para cada agente ejecutado (`✅/❌`) y para el endpoint `/api/chat`, facilitando depuración.
 
 ---
 
@@ -55,14 +65,14 @@ Implementar una arquitectura limpia donde:
 │                       ▼                                     │
 │               ┌──────────────┐                              │
 │               │  Groq LLM    │                              │
-│               │ (obligatorio)│                              │
+│               │ llama-3.3    │                              │
 │               └──────────────┘                              │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🔄 Flujo de Ejecución
+## 🔄 Flujo de Ejecución (Usado por el Node Workflow Editor)
 
 ### 1. **Entrada del Usuario**
 ```python
@@ -214,6 +224,7 @@ class AgentOrchestrator:
         self.agents: Dict[str, Any] = {}
         self.protocol = a2a_protocol  # Capa aislada
         self.graph = None  # StateGraph de LangGraph
+        self._register_orchestrator_agent()  # ← nuevo en v0.9.0
     
     def register_agents(self, agents: List[Any]):
         """Registra agentes en orchestrator y protocolo A2A"""
@@ -269,16 +280,12 @@ async def _execute_agents(self, state: AgentState) -> AgentState:
         payload={"query": state["user_query"], ...}
     )
     
-    # Ejecutar agente
-    result = await agent.execute(state["user_query"])
+    # Ejecutar agente usando A2A
+    response = await agent.handle_message(message)
     
     # Crear respuesta A2A
-    response = self.protocol.create_response(
-        original_message=message,
-        responder_id=agent_id,
-        result=result,
-        success=True
-    )
+    if response.success:
+        state["intermediate_results"][agent_id] = response.result
     
     # Actualizar estado
     state["a2a_messages"] = [message]

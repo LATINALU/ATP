@@ -65,7 +65,7 @@ def get_openai_client(api_config: Dict[str, Any] = None) -> tuple[OpenAI, str]:
         raise ValueError("No API key configured. Please add your API key in Settings.")
 
 
-def chat_completion(
+async def chat_completion(
     messages: List[Dict[str, str]], 
     model: str = None,
     api_config: Dict[str, Any] = None,
@@ -90,10 +90,10 @@ def chat_completion(
     return response.choices[0].message.content
 
 
-def test_connection(api_config: Dict[str, Any] = None) -> bool:
+async def test_connection(api_config: Dict[str, Any] = None) -> bool:
     """Prueba la conexión con el modelo"""
     try:
-        result = chat_completion(
+        result = await chat_completion(
             messages=[{"role": "user", "content": "Responde solo 'OK'"}],
             api_config=api_config,
             max_tokens=10

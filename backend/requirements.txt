@@ -5,12 +5,10 @@ pydantic==2.9.2
 python-dotenv==1.0.1
 httpx==0.28.1
 
-# LangGraph y LangChain Core
+# LangGraph - Motor de orquestación de flujo
 langgraph>=0.2.0
-langchain-core>=0.3.0
-langchain-openai>=0.2.0
 
-# OpenAI SDK
+# OpenAI SDK - Compatible con múltiples proveedores (Groq, OpenRouter, etc.)
 openai>=2.9.0
 
 # Utilidades adicionales

@@ -45,6 +45,7 @@ class AgentCapability(str, Enum):
     
     # Communication Capabilities
     WRITING = "writing"
+    COMMUNICATION = "communication"
     TRANSLATION = "translation"
     DOCUMENTATION = "documentation"
     PRESENTATION = "presentation"

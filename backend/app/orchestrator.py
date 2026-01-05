@@ -20,8 +20,14 @@ from datetime import datetime
 import uuid
 
 from app.a2a_protocol import (
-    A2AMessage, A2AResponse, AgentCapability, MessageType,
-    Priority, a2a_protocol, AgentStatus
+    A2AMessage,
+    A2AResponse,
+    AgentCapability,
+    AgentProfile,
+    MessageType,
+    Priority,
+    a2a_protocol,
+    AgentStatus,
 )
 
 
@@ -83,6 +89,7 @@ class AgentOrchestrator:
         
         # Instancia del protocolo A2A (capa de comunicación aislada)
         self.protocol = a2a_protocol
+        self._register_orchestrator_agent()
         
         # Grafo de LangGraph (se construye dinámicamente)
         self.graph = None
@@ -95,6 +102,25 @@ class AgentOrchestrator:
             "total_a2a_messages": 0,
             "average_response_time_ms": 0.0
         }
+    
+    def _register_orchestrator_agent(self) -> None:
+        """Asegura que el orquestador exista dentro del registro A2A."""
+        orchestrator_id = "orchestrator"
+        if orchestrator_id in self.protocol.agent_registry:
+            return
+
+        orchestrator_profile = AgentProfile(
+            agent_id=orchestrator_id,
+            name="LangGraph Orchestrator",
+            primary_capability=AgentCapability.REASONING,
+            specialization="Workflow coordination and messaging",
+            description="Nodo central que coordina el flujo LangGraph y enruta mensajes A2A.",
+            backstory="Entidad de orquestación encargada de mantener la integridad del pipeline.",
+            model_name="orchestrator",
+            temperature=0.0,
+            max_tokens=1,
+        )
+        self.protocol.register_agent(orchestrator_profile)
     
     def register_agents(self, agents: List[Any]) -> None:
         """
@@ -219,6 +245,12 @@ class AgentOrchestrator:
             self.stats["total_queries"] += 1
             self.stats["failed_queries"] += 1
             
+            # Log detallado del error
+            import traceback
+            error_traceback = traceback.format_exc()
+            print(f"❌ ERROR EN ORCHESTRATOR: {str(e)}")
+            print(f"📋 TRACEBACK:\n{error_traceback}")
+            
             return {
                 "success": False,
                 "error": str(e),
@@ -282,6 +314,7 @@ class AgentOrchestrator:
                 sender_capability=AgentCapability.REASONING,
                 subject=f"Task Execution Request for {agent_id}",
                 payload={
+                    "task": state["user_query"],
                     "query": state["user_query"],
                     "context": state["context"],
                     "previous_results": state["intermediate_results"]
@@ -289,42 +322,37 @@ class AgentOrchestrator:
                 message_type=MessageType.REQUEST,
                 recipient_id=agent_id,
                 priority=Priority.NORMAL,
-                conversation_id=state["conversation_id"]
+                conversation_id=state["conversation_id"],
+                context={
+                    "user_context": state["context"],
+                    "previous_results": state["intermediate_results"],
+                },
             )
             
-            # Ejecutar agente (el agente procesa el mensaje A2A)
-            result = await agent.execute(state["user_query"])
+            # Ejecutar agente mediante protocolo A2A
+            agent_response = await agent.handle_message(agent_message)
             
-            # Crear respuesta A2A
-            agent_response = self.protocol.create_response(
-                original_message=agent_message,
-                responder_id=agent_id,
-                responder_capability=agent.profile.primary_capability,
-                result=result,
-                success=True,
-                reasoning=f"Processed by {agent.profile.name}"
-            )
-            
-            # Almacenar resultados
+            # Almacenar intercambio A2A
             state.setdefault("a2a_messages", []).append(agent_message)
             state.setdefault("a2a_responses", []).append(agent_response)
-            state["intermediate_results"][agent_id] = result
-            state["agents_completed"].append(agent_id)
-            state["current_step"] = f"executed_{agent_id}"
             
+            if agent_response.success:
+                # Extraer el contenido del resultado (puede ser dict o string)
+                result_content = agent_response.result
+                if isinstance(result_content, dict):
+                    # Si es dict, convertir a string legible
+                    result_content = str(result_content)
+                
+                state["intermediate_results"][agent_id] = result_content
+                state["agents_completed"].append(agent_id)
+                state["current_step"] = f"executed_{agent_id}"
+                print(f"✅ Agente {agent_id} completado exitosamente")
+            else:
+                error_detail = agent_response.error_message or "Unknown agent error"
+                state["error"] = f"Agent {agent_id} failed: {error_detail}"
+                print(f"❌ Agente {agent_id} falló: {error_detail}")
+        
         except Exception as e:
-            # Crear respuesta de error
-            error_response = A2AResponse(
-                original_message_id=agent_message.message_id if 'agent_message' in locals() else "error",
-                conversation_id=state["conversation_id"],
-                responder_id=agent_id,
-                responder_capability=AgentCapability.REASONING,
-                success=False,
-                result=None,
-                error_message=str(e)
-            )
-            
-            state.setdefault("a2a_responses", []).append(error_response)
             state["error"] = f"Error executing {agent_id}: {str(e)}"
         
         return state

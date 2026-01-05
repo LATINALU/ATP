@@ -56,9 +56,7 @@ class CommunicationAgent(BaseAgent):
             Mi expertise abarca:
             
             COMUNICACIÓN EFECTIVA:
-            - Claridad en el mensaje (eliminar ambigüedad,
-            model=model,
-            api_config=api_config
+            - Claridad en el mensaje (eliminar ambigüedad)
             - Escucha activa (entender antes de responder)
             - Empatía (ponerse en zapatos del otro)
             - Asertividad (expresar sin agredir)
