@@ -55,7 +55,7 @@ export function Header({ model, onModelChange, isConnected, availableModels = []
           </h1>
           <div className="flex items-center gap-2 mt-0.5">
             <Badge variant="outline" className="text-xs font-mono">
-              v2.0.0
+              v2.0.1
             </Badge>
             <div className="flex items-center gap-1">
               <Wifi
@@ -107,7 +107,7 @@ export function Header({ model, onModelChange, isConnected, availableModels = []
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50 border border-primary/20">
           <Activity className={cn("h-4 w-4", availableModels.length > 0 ? "text-green-500" : "text-yellow-500")} />
           <span className="text-xs text-muted-foreground font-mono">
-            {availableModels.length > 0 ? `${availableModels.length} modelos` : "Sin API"}
+            {availableModels.length > 0 ? `${availableModels.length} modelos` : "⚠️ Configura API"}
           </span>
         </div>
       </div>

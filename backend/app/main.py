@@ -31,7 +31,7 @@ except ImportError:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifecycle manager for the app"""
-    print("🚀 ATP Backend v1.0.1 iniciando...")
+    print("🚀 Agentic Task Platform v2.0.1 iniciando...")
     print(f"📡 Modelos disponibles: {list(MODELS.keys())}")
     print(f"🤖 Agentes disponibles: {len(AGENT_DEFINITIONS)}")
     
@@ -43,13 +43,13 @@ async def lifespan(app: FastAPI):
         print("✅ Agentic RAG inicializado correctamente")
     
     yield
-    print("👋 ATP Backend cerrando...")
+    print("👋 Agentic Task Platform cerrando...")
 
 
 app = FastAPI(
-    title="ATP - Agentes de Tareas Polivalentes",
+    title="Agentic Task Platform",
     description="Sistema de 30 Agentes de IA con Agentic RAG y capacidad extrema de razonamiento",
-    version="1.0.1",
+    version="2.0.1",
     lifespan=lifespan,
 )
 
@@ -68,7 +68,7 @@ async def health_check():
     """Health check endpoint"""
     return HealthResponse(
         status="healthy",
-        version="1.0.0",
+        version="2.0.1",
         models_available=list(MODELS.keys()),
         agents_count=len(AGENT_DEFINITIONS),
     )
