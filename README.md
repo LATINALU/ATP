@@ -1,436 +1,219 @@
 # Agentic Task Platform (ATP)
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-0.6.1-orange.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-0.7.0-orange.svg" alt="Version">
   <img src="https://img.shields.io/badge/status-alpha-yellow.svg" alt="Status">
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
   <img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python">
-  <img src="https://img.shields.io/badge/LangGraph-0.2+-green.svg" alt="LangGraph">
-  <img src="https://img.shields.io/badge/A2A_Protocol-Implemented-purple.svg" alt="A2A Protocol">
+  <img src="https://img.shields.io/badge/LangGraph-StateGraph-green.svg" alt="LangGraph">
+  <img src="https://img.shields.io/badge/A2A_Protocol-Orchestrated-purple.svg" alt="A2A Protocol">
 </p>
 
-## 🎯 Sistema de Agentes Especializados de Última Generación
-
-**Arquitectura profesional diseñada por desarrollador senior con 30+ años de experiencia.**
-
-ATP es una plataforma de agentes de IA altamente especializados que utiliza **LangGraph** para orquestación inteligente y el **protocolo A2A** (Agent-to-Agent) para comunicación estructurada. Cada agente es una "supercomputadora única" con capacidades específicas y expertise de nivel master.
-
-> **v0.6.1 - Alpha Release**: Refactorización completa del sistema. Migración de CrewAI a LangGraph con protocolo A2A. Arquitectura modular, escalable y mantenible. Sistema en desarrollo activo.
-
-## 🚀 Características Principales
-
-### 🎯 Sistema de Nodos Profesional
-- **9 Tipos de Nodos**:
-  - 🟣 **Prompt Principal** - Inicio del flujo con prompts +/-
-  - 🔴 **Agent Level 1-5** - 30 agentes organizados en 5 niveles (6 por nivel)
-  - 🟠 **AI Provider** - Configuración de modelos y parámetros
-  - 🔵 **Output Base** - Resultados intermedios con cadenas de agentes
-  - 🟢 **Output Final** - Resultado final con Copy/Save/View
-
-### 🎨 Sistema de Handles por Color
-- 🟣 **Morado** - Conexiones de Prompt
-- 🟠 **Naranja** - Conexiones de AI Provider
-- 🔵 **Azul** - Conexiones de datos entre agentes
-- ✅ **Validación estricta** - Solo conexiones válidas permitidas
-
-### 🌍 Características Avanzadas
-- **30 Agentes especializados** filtrados por nivel
-- **Doble interfaz**:
-  - 💬 **Chat Interface** - Conversacional con memoria
-  - 🔷 **Node Workflow Editor** - Visual con drag & drop
-- **10 Temas profesionales** rediseñados (Corporate, Gamer, Cyborg, etc.)
-- **Soporte multiidioma** (Español/Inglés) con toggle
-- **Import/Export** de workflows en JSON
-- **Múltiples proveedores**: OpenAI, DeepSeek, Groq, Anthropic, Ollama, Together AI, OpenRouter
-- **Ejecución asíncrona** de workflows con validación
-- **API REST** con FastAPI + Docker
+ATP es una plataforma agentic diseñada para equipos que necesitan coordinar **30 agentes especializados** mediante un pipeline visual y un backend unificado basado en **LangGraph + A2A Protocol**.  
+La nueva versión alinea **Node Workflow Editor**, **Chat Interface** y **Agent Orchestrator** bajo un mismo flujo:  
+**User Query → LangGraph StateGraph → A2A Messages → Agents Cluster → A2A Responses → Synthesis → Final Result**.
 
 ---
 
-## 📊 Arquitectura de Agentes
+## 🚀 Highlights Clave
 
-### Nivel 1 - CRÍTICOS (Núcleo de Razonamiento)
-| Agente | Función |
-|--------|---------|
-| `reasoning_agent` | Razonamiento lógico, deducción, inducción |
-| `planning_agent` | Planificación estratégica y gestión de proyectos |
-| `research_agent` | Investigación profunda y síntesis de información |
-| `analysis_agent` | Análisis y descomposición de problemas |
-| `synthesis_agent` | Integración de conocimiento y generación de insights |
-| `critical_thinking_agent` | Evaluación crítica y detección de falacias |
-
-### Nivel 2 - ESENCIALES (Capacidades Fundamentales)
-| Agente | Función |
-|--------|---------|
-| `coding_agent` | Programación y desarrollo de software |
-| `writing_agent` | Escritura y comunicación profesional |
-| `data_agent` | Análisis de datos y estadísticas |
-| `communication_agent` | Comunicación interpersonal y stakeholders |
-| `decision_agent` | Toma de decisiones estructurada |
-| `problem_solving_agent` | Resolución creativa de problemas |
-
-### Nivel 3 - ESPECIALIZADOS (Dominios Específicos)
-| Agente | Función |
-|--------|---------|
-| `creative_agent` | Creatividad e innovación |
-| `optimization_agent` | Optimización de procesos y eficiencia |
-| `quality_agent` | Control de calidad y testing |
-| `security_agent` | Seguridad y auditoría |
-| `marketing_agent` | Marketing digital y SEO |
-| `design_agent` | Diseño UX/UI y prototipado |
-
-### Nivel 4 - SOPORTE (Calidad y Mantenimiento)
-| Agente | Función |
-|--------|---------|
-| `documentation_agent` | Documentación técnica y tutoriales |
-| `translation_agent` | Traducción y localización |
-| `formatting_agent` | Formato y presentación |
-| `review_agent` | Revisión y edición de contenido |
-| `testing_agent` | Testing de software y QA |
-| `support_agent` | Atención al cliente y soporte |
-
-### Nivel 5 - AUXILIARES (Funciones Complementarias)
-| Agente | Función |
-|--------|---------|
-| `summarization_agent` | Resumen y síntesis de información |
-| `validation_agent` | Validación y verificación de datos |
-| `extraction_agent` | Extracción y parsing de información |
-| `classification_agent` | Clasificación y categorización |
-| `conversion_agent` | Conversión de formatos |
-| `monitoring_agent` | Monitoreo y seguimiento de procesos |
+| Área | Novedades |
+|------|-----------|
+| **Orquestación** | Backend FastAPI con LangGraph StateGraph, agentes aislados y protocolo A2A para mensajes estructurados. |
+| **Node Workflow Editor** | 7 nodos oficiales, handles color-coded y validaciones estrictas para recrear el pipeline real. |
+| **Chat Mode** | Conversación multiagente en tiempo real, uso opcional de API keys del usuario y fallback a modelos Groq configurados en el backend. |
+| **Memoria Conversacional** | Guardado con tags automáticos, filtros (favoritos / últimas 24h) y estadísticas rápidas. |
+| **Docker Ready** | Un único `docker-compose.yml` levanta frontend (Next.js 14) y backend (FastAPI) con hot-reload. |
+| **Documentación** | Nuevos manuales (`PROJECT_OVERVIEW.md`, `LANGGRAPH_A2A_ARCHITECTURE.md`, etc.) enfocados en operaciones y despliegue. |
 
 ---
 
-## 🐳 Instalación con Docker
+## 🧬 Pipeline Oficial (LangGraph + A2A)
 
-### Prerrequisitos
-- Docker Desktop instalado y ejecutándose
-- API Key de OpenAI
+```
+┌──────────────┐    ┌──────────────┐    ┌───────────────┐    ┌───────────────┐
+│  User Query  │ -> │  LangGraph   │ -> │  A2A Messages │ -> │ Agents Cluster │
+└──────────────┘    └──────────────┘    └───────────────┘    └───────────────┘
+        │                    │                    │                    │
+        ▼                    ▼                    ▼                    ▼
+┌──────────────┐    ┌──────────────┐    ┌───────────────┐    ┌──────────────┐
+│A2A Responses │ -> │  Synthesis   │ -> │  Final Result │ -> │ Frontend UI  │
+└──────────────┘    └──────────────┘    └───────────────┘    └──────────────┘
+```
+
+Cada etapa está representada por un nodo React Flow con handles y reglas propias. Los `WorkflowExecutor` en frontend y `AgentOrchestrator` en backend comparten el mismo contrato `/api/chat`.
+
+---
+
+## 🧩 Node Workflow Editor (React Flow)
+
+| Nodo | Descripción | Color de Handle |
+|------|-------------|-----------------|
+| **User Query Intake** | Prompt, contexto, persona y urgencia del usuario. | Cyan |
+| **LangGraph StateGraph** | Estrategia, modelo, paralelismo y límites de agentes. | Fuchsia |
+| **A2A Message Dispatch** | Configuración del canal A2A, prioridades y payloads. | Amber |
+| **Agents Cluster** | Selección multi-nivel (hasta 30 agentes) + concurrencia. | Sky |
+| **A2A Responses Collector** | Conteo de respuestas, timeout y auto-retry. | Indigo |
+| **Synthesis Engine** | Estrategia de síntesis, tono, # secciones, trace. | Violet |
+| **Final Result** | Presentación, exportación y acciones del output final. | Emerald |
+
+🧠 *Solo se permiten conexiones que respeten los colores y el orden oficial del flujo.*
+
+---
+
+## 💬 Chat Interface
+
+- Selección de agentes por nivel con contador visible (`✓ X / 30 activos`).
+- Vista de razonamiento en vivo + progreso por agente.
+- Configuración de modelos por agente y proveedor en el momento.
+- Memoria conversacional moderna con favoritos, tags, filtros y snapshot de la conversación activa.
+- El frontend envía siempre el pipeline completo al backend (`/api/chat`) para mantener la paridad con el editor visual.
+
+---
+
+## 👥 Catálogo de Agentes (30 perfiles)
+
+### Nivel 1 – Núcleo de Razonamiento
+`reasoning`, `planning`, `research`, `analysis`, `synthesis`, `critical_thinking`
+
+### Nivel 2 – Producción Profesional
+`coding`, `data`, `writing`, `communication`, `decision`, `problem_solving`
+
+### Nivel 3 – Dominios Especializados
+`legal`, `financial`, `creative`, `technical`, `educational`, `marketing`
+
+### Nivel 4 – Soporte Operativo
+`qa`, `documentation`, `optimization`, `security`, `integration`, `review`
+
+### Nivel 5 – Auxiliares Estratégicos
+`translation`, `summary`, `formatting`, `validation`, `coordination`, `explanation`
+
+Cada agente cuenta con su propio módulo en `backend/app/agents/` y comparte una clase base `BaseAgent` con tracing, logging y configuración de modelo/API.
+
+---
+
+## 🐳 Getting Started con Docker
+
+### Requisitos
+- Docker Desktop / Podman
+- Python 3.11+ (solo si quieres ejecutar localmente sin contenedores)
+- Una API Key de **Groq** (el backend está configurado para usar `openai/gpt-oss-120b` vía Groq)
 
 ### Pasos
-
-1. **Configurar variables de entorno**
 ```bash
-# Copiar el archivo de ejemplo
-cp .env.example .env
+# 1. Clonar el proyecto
+git clone https://github.com/LATINALU/ATP.git
+cd ATP
 
-# Editar .env y añadir tu API key
-# OPENAI_API_KEY=sk-tu-api-key-aqui
+# 2. Configurar variables (.env opcional si ya tienes la variable del host)
+copy .env.example .env  # Windows
+# edit .env y establece GROQ_API_KEY
+
+# 3. Levantar todo el stack
+docker-compose up -d --build
+
+# Backend → http://localhost:8001/api/health
+# Frontend → http://localhost:3000
 ```
 
-2. **Construir y ejecutar**
-```bash
-# Construir la imagen
-docker-compose build
-
-# Ejecutar el sistema principal
-docker-compose up atp-agents
-
-# O ejecutar en modo interactivo
-docker-compose run atp-interactive
-```
+> El backend monta el código como volumen (`./backend:/app`), por lo que cualquier cambio se refleja sin reconstruir la imagen. El frontend se sirve en modo producción (Next.js 14 build).
 
 ---
 
-## 💻 Instalación Local (sin Docker)
-
-### Prerrequisitos
-- Python 3.11+
-- pip
-
-### Pasos
-
-1. **Crear entorno virtual**
-```bash
-python -m venv venv
-
-# Windows
-venv\Scripts\activate
-
-# Linux/Mac
-source venv/bin/activate
-```
-
-2. **Instalar dependencias**
-```bash
-pip install -r requirements.txt
-```
-
-3. **Configurar variables de entorno**
-```bash
-cp .env.example .env
-# Editar .env con tu OPENAI_API_KEY
-```
-
-4. **Ejecutar**
-```bash
-# Modo principal
-python main.py
-
-# Modo interactivo
-python interactive.py
-```
-
----
-
-## 🎯 Uso
-
-### Modo Principal
-```bash
-python main.py
-```
-Muestra un menú con opciones para ver agentes y ejecutar demos.
-
-### Modo Interactivo
-```bash
-python interactive.py
-```
-
-**Comandos disponibles:**
-- `/agentes` - Ver todos los agentes
-- `/nivel N` - Ver agentes del nivel N (1-5)
-- `/usar AGENTE` - Usar un agente específico
-- `/historial` - Ver historial de la sesión
-- `/limpiar` - Limpiar contexto
-- `/ayuda` - Mostrar ayuda
-- `/salir` - Terminar
-
-**Ejemplo de uso:**
-```
-Tu tarea: Analiza las ventajas de usar microservicios vs monolito
-
-Tu tarea: Escribe un email profesional para solicitar una reunión
-
-Tu tarea: /usar coding_agent
-Tarea: Crea una función en Python para ordenar una lista
-```
-
----
-
-## 🧠 Sistema Agentic RAG (v1.0.1)
-
-El sistema ATP ahora incluye **Agentic RAG** (Generación Aumentada por Recuperación con Agentes), una arquitectura avanzada de 5 capas:
-
-### Arquitectura de Capas
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  CAPA 1: INTERACCIÓN INICIAL                                    │
-│  Usuario → Query → Agente Central                               │
-├─────────────────────────────────────────────────────────────────┤
-│  CAPA 2: CEREBRO DEL COORDINADOR                                │
-│  ┌─────────────┐  ┌─────────────────────────────────┐          │
-│  │   MEMORY    │  │         PLANNING                │          │
-│  │ Short Term  │  │  ReACT + Chain of Thought       │          │
-│  │ Long Term   │  │  Descomposición de tareas       │          │
-│  └─────────────┘  └─────────────────────────────────┘          │
-├─────────────────────────────────────────────────────────────────┤
-│  CAPA 3: DELEGACIÓN DE TAREAS                                   │
-│  Agente Central → Sub-Agentes Especializados (30 agentes)       │
-├─────────────────────────────────────────────────────────────────┤
-│  CAPA 4: MCP SERVERS (Model Context Protocol)                   │
-│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐            │
-│  │ Local Data   │ │Search Engine │ │ Cloud Engine │            │
-│  │ (Archivos)   │ │ (Internet)   │ │ (AWS/Azure)  │            │
-│  └──────────────┘ └──────────────┘ └──────────────┘            │
-├─────────────────────────────────────────────────────────────────┤
-│  CAPA 5: PROCESAMIENTO Y SALIDA                                 │
-│  Síntesis → LLM → Respuesta Final → Usuario                     │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### Componentes Principales
-
-| Componente | Descripción |
-|------------|-------------|
-| **Central Agent** | Coordinador principal que orquesta todo el flujo |
-| **Memory System** | Memoria a corto plazo (sesión) y largo plazo (persistente) |
-| **Planning Engine** | ReACT + Chain of Thought para planificación inteligente |
-| **MCP Servers** | Conexión con datos locales, búsqueda web y cloud |
-| **Sub-Agent Manager** | Gestiona los 30 agentes especializados |
-
-### Endpoints API Agentic RAG
-
-```bash
-# Consulta principal
-POST /api/agentic-rag
-{
-  "query": "Tu consulta aquí",
-  "agents": ["reasoning_agent", "coding_agent"],  # opcional
-  "use_memory": true,
-  "use_planning": true
-}
-
-# Estado del sistema
-GET /api/agentic-rag/status
-
-# Agentes disponibles
-GET /api/agentic-rag/agents
-
-# Almacenar conocimiento
-POST /api/agentic-rag/memory/store?fact=...&category=...
-
-# Limpiar sesión
-POST /api/agentic-rag/session/clear
-
-# Historial de consultas
-GET /api/agentic-rag/history
-```
-
----
-
-## 🧠 Marco de Razonamiento
-
-Cada agente implementa un marco de razonamiento profundo:
-
-1. **COMPRENSIÓN** - Análisis completo del problema
-2. **DESCOMPOSICIÓN** - División en partes manejables
-3. **ANÁLISIS MULTI-PERSPECTIVA** - Múltiples ángulos
-4. **SÍNTESIS** - Integración de hallazgos
-5. **METACOGNICIÓN** - Evaluación del propio razonamiento
-
----
-
-## 📁 Estructura del Proyecto
+## 🧱 Estructura de Carpetas
 
 ```
 ATP/
-├── agents/
-│   ├── __init__.py
-│   ├── base_agent.py          # Clase base con razonamiento
-│   ├── agent_factory.py       # Fábrica de agentes
-│   ├── level1_critical.py     # 6 agentes críticos
-│   ├── level2_essential.py    # 6 agentes esenciales
-│   ├── level3_specialized.py  # 6 agentes especializados
-│   ├── level4_support.py      # 6 agentes de soporte
-│   └── level5_auxiliary.py    # 6 agentes auxiliares
-├── orchestrator/
-│   ├── __init__.py
-│   └── task_orchestrator.py   # Orquestador principal
-├── config/
-│   ├── __init__.py
-│   └── settings.py            # Configuración central
-├── tools/
-│   ├── __init__.py
-│   ├── search_tools.py        # Herramientas de búsqueda
-│   └── web_tools.py           # Herramientas web
-├── main.py                    # Punto de entrada principal
-├── interactive.py             # Modo interactivo
-├── requirements.txt           # Dependencias Python
-├── Dockerfile                 # Imagen Docker
-├── docker-compose.yml         # Orquestación Docker
-├── .env.example              # Ejemplo de variables
-└── README.md                 # Esta documentación
+├── backend/
+│   ├── app/
+│   │   ├── agents/                 # 30 agentes especializados
+│   │   ├── orchestrator.py         # LangGraph + A2A executor
+│   │   ├── a2a_protocol.py         # Abstracción de mensajes A2A
+│   │   ├── main.py                 # FastAPI endpoints (/api/chat, /api/health, etc.)
+│   │   └── config.py               # Defaults (Groq models, CORS, etc.)
+│   └── requirements.txt
+├── frontend/
+│   ├── src/app/page.tsx            # Chat mode
+│   ├── src/app/nodes/page.tsx      # Node Workflow Editor
+│   ├── src/components/             # UI system (AgentCard, MemoryPanel, ThemeSelector…)
+│   └── src/lib/workflowExecutor.ts # Cliente que construye el payload del pipeline
+├── docker-compose.yml
+├── README.md
+└── docs/
+    ├── PROJECT_OVERVIEW.md
+    ├── LANGGRAPH_A2A_ARCHITECTURE.md
+    ├── IMPLEMENTATION_SUMMARY.md
+    └── CLEANUP_REPORT.md
 ```
 
 ---
 
-## ⚙️ Configuración Avanzada
+## 🔌 API Principal
 
-### Variables de Entorno
-
-| Variable | Descripción | Default |
-|----------|-------------|---------|
-| `OPENAI_API_KEY` | API Key de OpenAI | Requerido |
-| `OPENAI_MODEL` | Modelo a usar | `gpt-4o` |
-| `SERPER_API_KEY` | API Key para búsquedas web | Opcional |
-
-### Modelos Recomendados
-
-- **gpt-4o** - Máximo razonamiento (recomendado)
-- **gpt-4-turbo** - Balance rendimiento/costo
-- **gpt-3.5-turbo** - Económico, menor capacidad
-
----
-
-## 🔧 Personalización
-
-### Añadir Nuevos Agentes
-
-1. Crear clase heredando de `BaseAgent`
-2. Definir `level`, `name`, `role`, `goal`, `backstory`
-3. Registrar en el archivo de nivel correspondiente
-4. Actualizar `TASK_KEYWORDS` en `agent_factory.py`
-
-### Ejemplo:
-```python
-from agents.base_agent import BaseAgent
-
-class MyCustomAgent(BaseAgent):
-    def __init__(self, tools=None):
-        super().__init__(
-            level=3,
-            name="my_custom_agent",
-            role="Mi Rol Personalizado",
-            goal="Objetivo del agente...",
-            backstory="Historia y capacidades...",
-            tools=tools
-        )
+### `POST /api/chat`
+```json
+{
+  "message": "Describe la arquitectura del sistema.",
+  "agents": ["reasoning", "synthesis", "documentation"],
+  "model": "openai/gpt-oss-120b",
+  "apiConfig": { "id": "groq", "...": "..." },
+  "context": {
+    "langgraph": {...},
+    "a2a": {...},
+    "synthesis": {...}
+  }
+}
+```
+Respuesta:
+```json
+{
+  "success": true,
+  "result": "Texto final.",
+  "agents_used": ["reasoning", "synthesis", "documentation"],
+  "model_used": "openai/gpt-oss-120b",
+  "error": null
+}
 ```
 
----
-
-## 📝 Licencia
-
-MIT License - Uso libre para proyectos personales y comerciales.
+> **Nota:** Si el usuario no aporta `apiConfig`, el backend usa las credenciales Groq definidas en `backend/app/config.py`.
 
 ---
 
-## 🤝 Contribuciones
-
-Las contribuciones son bienvenidas. Por favor:
-1. Fork el repositorio
-2. Crea una rama para tu feature
-3. Envía un Pull Request
-
----
-
-## 🖥️ Frontend (Interfaz Web)
-
-El frontend es una aplicación moderna construida con:
-- **Next.js 14** - Framework React
-- **TailwindCSS** - Estilos
-- **Radix UI** - Componentes accesibles
-- **Lucide Icons** - Iconografía
-
-### Instalación del Frontend
+## 🧪 Desarrollo Local (sin Docker)
 
 ```bash
+# Backend
+cd backend
+pip install -r requirements.txt
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
+
+# Frontend
 cd frontend
 npm install
 npm run dev
 ```
 
-Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
+Asegúrate de exponer `GROQ_API_KEY` en tu entorno antes de iniciar el backend.
 
-### Configuración de APIs
+---
 
-1. Haz clic en el icono ⚙️ (configuración)
-2. Añade tus API keys (OpenAI, DeepSeek, Groq, etc.)
-3. Haz clic en "Detectar Modelos" para ver los modelos disponibles
-4. Selecciona el modelo orquestador en el header
-5. Configura modelos específicos por agente en "Ver más"
+## 🗺️ Roadmap
+- [ ] Streaming de eventos A2A en tiempo real hacia el frontend.
+- [ ] Persistencia de memorias en backend (actualmente solo LocalStorage).
+- [ ] Integración con más proveedores vía `ApiSettings`.
+- [ ] Testing e2e (Playwright) para garantir la paridad Chat ↔️ Nodes.
 
 ---
 
 ## 🤝 Contribuir
+1. Haz fork del repo.
+2. Crea una rama descriptiva (`feature/node-validation`).
+3. Envía un PR siguiendo el flujo del pipeline (mantén sincronizados frontend y backend).
 
-¡Las contribuciones son bienvenidas! Por favor lee [CONTRIBUTING.md](CONTRIBUTING.md) para más detalles.
-
-### Formas de contribuir:
-- 🐛 Reportar bugs
-- 💡 Sugerir nuevas características
-- 📝 Mejorar documentación
-- 🔧 Enviar Pull Requests
-
-### Áreas que necesitan ayuda:
-- [ ] Mejorar la integración con más proveedores de IA
-- [ ] Añadir más agentes especializados
-- [ ] Mejorar el sistema de razonamiento
-- [ ] Tests unitarios y de integración
-- [ ] Documentación en inglés
-- [ ] Optimización de rendimiento
+Sugerencias bienvenidas: bugs, mejoras de UI, nuevos agentes, optimización de LangGraph, etc.
 
 ---
 
-**Desarrollado con ❤️ usando CrewAI, FastAPI, Next.js y Google ADK**
+## 📝 Licencia
+MIT © LATINALU – uso libre para proyectos personales y comerciales.  
+Por favor, enlaza este repositorio cuando reutilices componentes esenciales.
