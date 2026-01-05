@@ -26,6 +26,7 @@ export interface ApiProvider {
   apiKey: string;
   baseUrl?: string;
   models: string[];
+  enabledModels?: string[]; // Modelos que el usuario ha habilitado para usar
   isActive: boolean;
 }
 
@@ -435,11 +436,72 @@ export function ApiSettings({ isOpen, onClose, onProvidersChange }: ApiSettingsP
                           )}
                         </div>
 
-                        {/* Models */}
+                        {/* Models Selection */}
                         <div>
-                          <label className="text-xs text-muted-foreground mb-1 block">
-                            Modelos Disponibles ({provider.models.length})
-                          </label>
+                          <div className="flex items-center justify-between mb-2">
+                            <label className="text-xs text-muted-foreground">
+                              Modelos Disponibles ({provider.models.length})
+                            </label>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => {
+                                  handleUpdateProvider(provider.id, { 
+                                    enabledModels: provider.models 
+                                  });
+                                }}
+                                className="text-xs text-primary hover:underline"
+                              >
+                                Todos
+                              </button>
+                              <button
+                                onClick={() => {
+                                  handleUpdateProvider(provider.id, { 
+                                    enabledModels: [] 
+                                  });
+                                }}
+                                className="text-xs text-muted-foreground hover:underline"
+                              >
+                                Ninguno
+                              </button>
+                            </div>
+                          </div>
+                          <div className="space-y-1 max-h-48 overflow-y-auto p-2 bg-background rounded border border-border">
+                            {provider.models.map((model) => {
+                              const isEnabled = provider.enabledModels?.includes(model) ?? true;
+                              return (
+                                <label
+                                  key={model}
+                                  className="flex items-center gap-2 p-2 rounded hover:bg-muted cursor-pointer transition-colors"
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={isEnabled}
+                                    onChange={(e) => {
+                                      const currentEnabled = provider.enabledModels || provider.models;
+                                      const newEnabled = e.target.checked
+                                        ? [...currentEnabled, model]
+                                        : currentEnabled.filter(m => m !== model);
+                                      handleUpdateProvider(provider.id, { 
+                                        enabledModels: newEnabled 
+                                      });
+                                    }}
+                                    className="w-4 h-4 rounded border-border text-primary focus:ring-2 focus:ring-primary/50"
+                                  />
+                                  <span className="text-xs text-foreground flex-1">{model}</span>
+                                  {isEnabled && (
+                                    <Check className="h-3 w-3 text-green-500" />
+                                  )}
+                                </label>
+                              );
+                            })}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            ✓ {provider.enabledModels?.length || provider.models.length} de {provider.models.length} modelos habilitados
+                          </p>
+                        </div>
+
+                        {/* Old Models Display (hidden) */}
+                        <div className="hidden">
                           <div className="flex flex-wrap gap-1 max-h-32 overflow-y-auto">
                             {provider.models.map((model) => (
                               <span

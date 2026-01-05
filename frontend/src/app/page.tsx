@@ -8,7 +8,9 @@ import { ThemeSelector } from "@/components/ThemeSelector";
 import { LiveReasoning } from "@/components/AgentReasoning";
 import { MemoryPanel } from "@/components/MemoryPanel";
 import { ApiSettings, ApiProvider } from "@/components/ApiSettings";
-import { Settings, Plus, RotateCcw } from "lucide-react";
+import { Settings, Plus, LayoutGrid } from "lucide-react";
+import Link from "next/link";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { Agent, Message } from "@/types";
 
 const AGENTS_DATA: Agent[] = [
@@ -254,6 +256,14 @@ export default function Home() {
     <div className="h-screen flex flex-col bg-background">
       {/* Theme Selector & API Settings & New Chat - Fixed Position */}
       <div className="fixed top-4 right-4 z-[100] flex items-center gap-2">
+        <Link
+          href="/nodes"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border hover:bg-muted transition-colors"
+          title="Switch to Node Workflow Editor"
+        >
+          <LayoutGrid className="h-4 w-4 text-primary" />
+          <span className="text-sm font-medium hidden md:inline">Node Workflow Editor</span>
+        </Link>
         <button
           onClick={handleNewChat}
           className="p-2 rounded-lg bg-card border border-border hover:bg-muted transition-colors"
@@ -268,6 +278,7 @@ export default function Home() {
         >
           <Settings className="h-4 w-4 text-primary" />
         </button>
+        <LanguageSelector />
         <ThemeSelector />
       </div>
 

@@ -1,30 +1,45 @@
 # ATP - Agentes de Tareas Polivalentes
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.0.2-green.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-2.0.0-green.svg" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">
   <img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python">
   <img src="https://img.shields.io/badge/next.js-14-black.svg" alt="Next.js">
-  <img src="https://img.shields.io/badge/OpenAI_SDK-2.9+-orange.svg" alt="OpenAI SDK">
+  <img src="https://img.shields.io/badge/ReactFlow-11+-purple.svg" alt="ReactFlow">
 </p>
 
-Sistema de **30 Agentes de IA** con OpenAI SDK, organizados en 5 niveles de importancia, diseñados para resolver cualquier tipo de tarea con capacidad extrema de razonamiento.
+Sistema de **30 Agentes de IA** con OpenAI SDK, organizados en 5 niveles de importancia, con **Node Workflow Editor** profesional para crear flujos de trabajo visuales complejos.
 
-> **v1.0.2 - Rework Completo**: Sistema reescrito usando OpenAI SDK directamente para máxima compatibilidad y estabilidad. Eliminadas dependencias problemáticas (CrewAI, LangChain).
+> **v2.0.0 - Node Workflow System**: Sistema completamente rediseñado con editor de nodos visual, 30 agentes organizados en 5 niveles, validación de conexiones por colores, 10 temas profesionales, y soporte multiidioma (ES/EN).
 
-## 🚀 Características
+## 🚀 Características Principales
 
-- **30 Agentes especializados** organizados por niveles de importancia
-- **Interfaz Web moderna** con diseño cyberpunk/hacker (React + Next.js + TailwindCSS)
-- **Múltiples proveedores de IA**: OpenAI, DeepSeek, Groq, OpenRouter y más
-- **Configuración dinámica de APIs** desde la interfaz
-- **Selección de modelo por agente** - cada agente puede usar un modelo diferente
-- **Razonamiento profundo** con Chain-of-Thought integrado
-- **Selección automática** de agentes según la tarea
-- **Ejecución en Docker** para portabilidad
-- **API REST** con FastAPI
-- **Temas personalizables** (Cyberpunk, Matrix, Neon, etc.)
+### 🎯 Sistema de Nodos Profesional
+- **9 Tipos de Nodos**:
+  - 🟣 **Prompt Principal** - Inicio del flujo con prompts +/-
+  - 🔴 **Agent Level 1-5** - 30 agentes organizados en 5 niveles (6 por nivel)
+  - 🟠 **AI Provider** - Configuración de modelos y parámetros
+  - 🔵 **Output Base** - Resultados intermedios con cadenas de agentes
+  - 🟢 **Output Final** - Resultado final con Copy/Save/View
+
+### 🎨 Sistema de Handles por Color
+- 🟣 **Morado** - Conexiones de Prompt
+- 🟠 **Naranja** - Conexiones de AI Provider
+- 🔵 **Azul** - Conexiones de datos entre agentes
+- ✅ **Validación estricta** - Solo conexiones válidas permitidas
+
+### 🌍 Características Avanzadas
+- **30 Agentes especializados** filtrados por nivel
+- **Doble interfaz**:
+  - 💬 **Chat Interface** - Conversacional con memoria
+  - 🔷 **Node Workflow Editor** - Visual con drag & drop
+- **10 Temas profesionales** rediseñados (Corporate, Gamer, Cyborg, etc.)
+- **Soporte multiidioma** (Español/Inglés) con toggle
+- **Import/Export** de workflows en JSON
+- **Múltiples proveedores**: OpenAI, DeepSeek, Groq, Anthropic, Ollama, Together AI, OpenRouter
+- **Ejecución asíncrona** de workflows con validación
+- **API REST** con FastAPI + Docker
 
 ---
 
@@ -53,32 +68,32 @@ Sistema de **30 Agentes de IA** con OpenAI SDK, organizados en 5 niveles de impo
 ### Nivel 3 - ESPECIALIZADOS (Dominios Específicos)
 | Agente | Función |
 |--------|---------|
-| `legal_agent` | Aspectos legales y cumplimiento |
-| `financial_agent` | Análisis financiero y económico |
 | `creative_agent` | Creatividad e innovación |
-| `technical_agent` | Arquitectura técnica y sistemas |
-| `educational_agent` | Enseñanza y diseño instruccional |
-| `marketing_agent` | Marketing y estrategia comercial |
+| `optimization_agent` | Optimización de procesos y eficiencia |
+| `quality_agent` | Control de calidad y testing |
+| `security_agent` | Seguridad y auditoría |
+| `marketing_agent` | Marketing digital y SEO |
+| `design_agent` | Diseño UX/UI y prototipado |
 
 ### Nivel 4 - SOPORTE (Calidad y Mantenimiento)
 | Agente | Función |
 |--------|---------|
-| `qa_agent` | Quality Assurance y testing |
-| `documentation_agent` | Documentación técnica |
-| `optimization_agent` | Optimización y rendimiento |
-| `security_agent` | Seguridad de la información |
-| `integration_agent` | Integración de sistemas y APIs |
-| `review_agent` | Revisión y feedback constructivo |
+| `documentation_agent` | Documentación técnica y tutoriales |
+| `translation_agent` | Traducción y localización |
+| `formatting_agent` | Formato y presentación |
+| `review_agent` | Revisión y edición de contenido |
+| `testing_agent` | Testing de software y QA |
+| `support_agent` | Atención al cliente y soporte |
 
 ### Nivel 5 - AUXILIARES (Funciones Complementarias)
 | Agente | Función |
 |--------|---------|
-| `translation_agent` | Traducción y localización |
-| `summary_agent` | Resumen y condensación |
-| `formatting_agent` | Formato y presentación |
-| `validation_agent` | Validación y verificación |
-| `coordination_agent` | Coordinación de equipos |
-| `explanation_agent` | Explicación de conceptos |
+| `summarization_agent` | Resumen y síntesis de información |
+| `validation_agent` | Validación y verificación de datos |
+| `extraction_agent` | Extracción y parsing de información |
+| `classification_agent` | Clasificación y categorización |
+| `conversion_agent` | Conversión de formatos |
+| `monitoring_agent` | Monitoreo y seguimiento de procesos |
 
 ---
 

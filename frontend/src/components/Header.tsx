@@ -58,7 +58,7 @@ export function Header({ model, onModelChange, isConnected, availableModels = []
           </h1>
           <div className="flex items-center gap-2 mt-0.5">
             <Badge variant="outline" className="text-xs font-mono">
-              v1.0.0
+              v2.0.0
             </Badge>
             <div className="flex items-center gap-1">
               <Wifi
